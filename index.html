@@ -11,14 +11,8 @@
         .temp-hero { font-size: 4rem; font-weight: bold; color: #2d3748; margin: 10px 0; }
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
         .data-bubble { background: #f7fafc; padding: 15px; border-radius: 15px; font-size: 0.9rem; color: #4a5568; }
-        
-        /* Location styles */
         .loc-main { color: #2d3748; font-weight: 800; font-size: 1.2rem; margin: 0; }
         .loc-sub { color: #718096; font-size: 0.9rem; margin: 2px 0; }
-        
-        .gps-footer { font-size: 0.75rem; color: #a0aec0; margin-top: 15px; }
-        input { padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; width: 60%; }
-        button { padding: 10px 15px; border-radius: 10px; border: none; background: #63b3ed; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -41,7 +35,7 @@
         const R = 3958.8;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2)**2;
         return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
     }
 
@@ -55,13 +49,23 @@
             const nearRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&zoom=10&featuretype=city&format=json`);
             const nearData = await nearRes.json();
             
-            const primary = locData.locality || locData.city || "Current Location";
-            const line2 = `(${locData.principalSubdivision || ''}, ${locData.countryName || 'USA'})`;
+            // Constructing the name cleanly
+            let rawName = locData.locality || locData.city || "Unknown Location";
+            let cleanName = rawName.replace(/^(Township of|City of|Village of)\s+/i, "");
+            
+            // If it's a township, explicitly add "Township" back to the end
+            if (rawName.toLowerCase().includes("township")) {
+                cleanName = `${cleanName} Township`;
+            }
+
+            const state = locData.principalSubdivisionCode ? locData.principalSubdivisionCode.split('-')[1] : locData.principalSubdivision;
+            const line1 = `${cleanName}, ${state}`;
+            const line2 = `(${locData.principalSubdivision || 'Unknown Region'}, United States)`;
             
             let line3 = "";
             if (nearData && nearData.address) {
                 const city = nearData.address.city || nearData.address.town || "";
-                if (city && city.toLowerCase() !== primary.toLowerCase()) {
+                if (city && city.toLowerCase() !== cleanName.toLowerCase()) {
                     const dist = getDistance(lat, lon, nearData.lat, nearData.lon);
                     line3 = `(Nearest city: ${city}, ${dist} miles)`;
                 }
@@ -72,7 +76,7 @@
             const c = data.current;
             
             weatherDiv.innerHTML = `
-                <p class="loc-main">${primary}</p>
+                <p class="loc-main">${line1}</p>
                 <p class="loc-sub">${line2}</p>
                 ${line3 ? `<p class="loc-sub">${line3}</p>` : ''}
                 <div class="temp-hero">${Math.round(c.temperature_2m)}°</div>
