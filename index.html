@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Weather Dashboard</title>
+    <title>Daily Weather</title>
     <style>
         #weather-card {
             border: 1px solid #ccc;
@@ -22,23 +22,21 @@
             border-top: 1px solid #eee;
         }
         .gps-footer {
-            margin-top: 20px;
+            margin-top: 10px;
             font-size: 0.8em;
             color: #666;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
 <div id="weather-card">
-    <h2>Weather Dashboard</h2>
+    <h2>Daily Weather</h2>
     <input type="text" id="locationInput" placeholder="Zip code or City, State">
     <button onclick="handleManualInput()">Search</button>
     <button onclick="handleGPS()">Use GPS LOC</button>
     <div id="weather-data">Loading...</div>
-    <div id="gps-info" class="gps-footer"></div>
 </div>
 
 <script>
@@ -53,7 +51,6 @@
     async function fetchWeather(lat, lon) {
         const weatherDiv = document.getElementById('weather-data');
         weatherDiv.innerText = "Loading...";
-        document.getElementById('gps-info').innerText = `Coords: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}`;
         
         try {
             const locRes = await fetchWithTimeout(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
@@ -70,7 +67,8 @@
             const formatTime = (isoString) => new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const today = new Date().toISOString().split('T')[0];
             
-            let hourlyHtml = '<h4>Today\'s Forecast:</h4><ul class="hourly-list">';
+            let hourlyHtml = '<div class="gps-footer">Coords: ' + parseFloat(lat).toFixed(4) + ', ' + parseFloat(lon).toFixed(4) + '</div>';
+            hourlyHtml += '<h4>Today\'s Forecast:</h4><ul class="hourly-list">';
             for(let i = 0; i < hourly.time.length; i++) {
                 if (hourly.time[i].startsWith(today)) {
                     hourlyHtml += `<li>${formatTime(hourly.time[i])} - ${hourly.temperature_2m[i]}°F</li>`;
@@ -82,13 +80,13 @@
                 <p><strong>Location:</strong> ${locationName}</p>
                 <p><strong>Temp:</strong> ${curr.temperature_2m}°F (Feels like: ${curr.apparent_temperature}°F)</p>
                 <p><strong>Daily Range:</strong> ${daily.temperature_2m_min[0]}°F - ${daily.temperature_2m_max[0]}°F</p>
-                <p><strong>Visibility:</strong> ${(curr.visibility / 1609.34).toFixed(1)} miles</p>
-                <p><strong>UV Index:</strong> ${daily.uv_index_max[0]}</p>
                 <p><strong>Sun:</strong> ↑ ${formatTime(daily.sunrise[0])} | ↓ ${formatTime(daily.sunset[0])}</p>
                 <p><strong>Wind:</strong> ${curr.wind_speed_10m} mph from ${curr.wind_direction_10m}°</p>
                 <p><strong>Humidity:</strong> ${curr.relative_humidity_2m}%</p>
                 <p><strong>Precipitation:</strong> ${curr.precipitation} in</p>
                 <p><strong>Chance of Rain:</strong> ${curr.precipitation_probability}%</p>
+                <p><strong>Visibility:</strong> ${(curr.visibility / 1609.34).toFixed(1)} miles</p>
+                <p><strong>UV Index:</strong> ${daily.uv_index_max[0]}</p>
                 ${hourlyHtml}
             `;
         } catch (error) {
