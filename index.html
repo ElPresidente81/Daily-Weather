@@ -11,8 +11,8 @@
         .temp-hero { font-size: 4rem; font-weight: bold; color: #2d3748; margin: 10px 0; }
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
         .data-bubble { background: #f7fafc; padding: 15px; border-radius: 15px; font-size: 0.9rem; color: #4a5568; }
-        .loc-main { color: #2d3748; font-weight: 800; font-size: 1.2rem; margin: 0; }
-        .loc-sub { color: #718096; font-size: 0.9rem; margin: 2px 0; }
+        .loc-main { color: #2d3748; font-weight: 800; font-size: 1.3rem; margin: 0; }
+        .loc-sub { color: #718096; font-size: 0.95rem; margin-top: 5px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -31,46 +31,24 @@
         return response;
     }
 
-    function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 3958.8;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2)**2;
-        return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
-    }
-
     async function fetchWeather(lat, lon) {
         const weatherDiv = document.getElementById('weather-data');
         weatherDiv.innerHTML = "Loading...";
         try {
-            const locRes = await fetchWithTimeout(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-            const locData = await locRes.json();
+            // 1. Fetch 'Snap-to-City' using OSM Nominatim
+            const cityRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&featuretype=city`);
+            const cityData = await cityRes.json();
             
-            const nearRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&zoom=10&featuretype=city&format=json`);
-            const nearData = await nearRes.json();
+            // 2. Extract city/state components
+            const addr = cityData.address || {};
+            const cityName = addr.city || addr.town || addr.village || "Unknown Location";
+            const stateName = addr.state || "";
             
-            // Constructing the name cleanly
-            let rawName = locData.locality || locData.city || "Unknown Location";
-            let cleanName = rawName.replace(/^(Township of|City of|Village of)\s+/i, "");
-            
-            // If it's a township, explicitly add "Township" back to the end
-            if (rawName.toLowerCase().includes("township")) {
-                cleanName = `${cleanName} Township`;
-            }
+            // 3. Construct display lines
+            const line1 = cityName;
+            const line2 = `(${stateName}, United States)`;
 
-            const state = locData.principalSubdivisionCode ? locData.principalSubdivisionCode.split('-')[1] : locData.principalSubdivision;
-            const line1 = `${cleanName}, ${state}`;
-            const line2 = `(${locData.principalSubdivision || 'Unknown Region'}, United States)`;
-            
-            let line3 = "";
-            if (nearData && nearData.address) {
-                const city = nearData.address.city || nearData.address.town || "";
-                if (city && city.toLowerCase() !== cleanName.toLowerCase()) {
-                    const dist = getDistance(lat, lon, nearData.lat, nearData.lon);
-                    line3 = `(Nearest city: ${city}, ${dist} miles)`;
-                }
-            }
-
+            // 4. Fetch weather data
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,precipitation_probability,visibility&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto`;
             const data = await (await fetchWithTimeout(url)).json();
             const c = data.current;
@@ -78,7 +56,6 @@
             weatherDiv.innerHTML = `
                 <p class="loc-main">${line1}</p>
                 <p class="loc-sub">${line2}</p>
-                ${line3 ? `<p class="loc-sub">${line3}</p>` : ''}
                 <div class="temp-hero">${Math.round(c.temperature_2m)}°</div>
                 <p>Feels like ${Math.round(c.apparent_temperature)}°</p>
                 <div class="grid-container">
