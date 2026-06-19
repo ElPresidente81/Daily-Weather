@@ -3,61 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Weather</title>
+    <title>Weather Report</title>
     <style>
-        body { background: #f0f4f8; font-family: sans-serif; display: flex; justify-content: center; padding-top: 20px; }
-        #weather-card { background: white; padding: 30px; width: 340px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
-        .loc-label { font-weight: bold; color: #718096; font-size: 0.75rem; display: block; margin-top: 12px; }
-        .loc-value { color: #2d3748; font-weight: 700; font-size: 1.1rem; }
-        .temp-hero { font-size: 3.5rem; font-weight: bold; color: #2d3748; margin: 15px 0; }
-        button { margin-top: 20px; padding: 10px 20px; border-radius: 10px; border: none; background: #63b3ed; color: white; cursor: pointer; }
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        #card { border: 1px solid #ccc; padding: 20px; width: 300px; border-radius: 10px; }
+        .label { font-weight: bold; font-size: 0.7rem; color: #666; text-transform: uppercase; margin-top: 15px; display: block; }
+        .val { font-weight: bold; font-size: 1rem; }
+        .temp { font-size: 3rem; text-align: center; margin: 20px 0; }
     </style>
 </head>
 <body>
-<div id="weather-card">
-    <div id="weather-data">Loading weather...</div>
+<div id="card">
+    <div id="data">Loading...</div>
 </div>
 <script>
-    async function fetchWeather(lat, lon) {
+    async function updateWeather(lat, lon) {
         try {
-            // Fetch location data with a broad zoom to ensure we get administrative context
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`);
-            const geoData = await geoRes.json();
-            const addr = geoData.address || {};
+            const geo = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`)).json();
+            const addr = geo.address || {};
             
-            // "Ladder of Reliability": Pick the first available specific name
-            const exact = addr.city || addr.town || addr.village || addr.municipality || addr.county || "Local Area";
-            const general = `${addr.state || 'Regional Area'}, United States`;
-            
-            // Relative Location: Specifically look for a nearby city
-            const nearRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&featuretype=city&zoom=8`);
-            const nearData = await nearRes.json();
-            const relCity = nearData.address?.city || nearData.address?.town || "Nearby Region";
-            const relative = `Near ${relCity}`;
+            // Line 1: As specific as possible, or UNKNOWN
+            const line1 = addr.village || addr.town || addr.city || addr.municipality || "UNKNOWN";
+            // Line 2: Specific source
+            const line2 = addr.town || addr.city || "Weather Station";
+            // Line 3: County/State/Regional info
+            const line3 = `${addr.county || ''} ${addr.state || ''}`.trim();
 
-            // Fetch weather data
-            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&temperature_unit=fahrenheit`);
-            const wData = await weatherRes.json();
+            const weather = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&temperature_unit=fahrenheit`)).json();
 
-            document.getElementById('weather-data').innerHTML = `
-                <span class="loc-label">Exact location:</span><div class="loc-value">${exact}</div>
-                <span class="loc-label">General location:</span><div class="loc-value">${general}</div>
-                <span class="loc-label">Relative location:</span><div class="loc-value">${relative}</div>
-                <div class="temp-hero">${Math.round(wData.current.temperature_2m)}°</div>
-                <button onclick="getLocation()">Refresh Location</button>
+            document.getElementById('data').innerHTML = `
+                <span class="label">Current Location:</span><div class="val">${line1}</div>
+                <span class="label">Weather Source:</span><div class="val">Station: ${line2}</div>
+                <span class="label">Additional Location Info:</span><div class="val">${line3}</div>
+                <div class="temp">${Math.round(weather.current.temperature_2m)}°F</div>
+                <button onclick="getLocation()">Refresh</button>
             `;
-        } catch (e) { document.getElementById('weather-data').innerHTML = "Unable to fetch location."; }
+        } catch(e) { document.getElementById('data').innerHTML = "Error loading data."; }
     }
 
     function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+                (p) => updateWeather(p.coords.latitude, p.coords.longitude),
                 async () => {
-                    // Fallback to IP lookup if GPS is denied
-                    const ipRes = await fetch("https://ipapi.co/json/");
-                    const data = await ipRes.json();
-                    fetchWeather(data.latitude, data.longitude);
+                    const ip = await (await fetch("https://ipapi.co/json/")).json();
+                    updateWeather(ip.latitude, ip.longitude);
                 }
             );
         }
