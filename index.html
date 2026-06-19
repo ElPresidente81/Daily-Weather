@@ -13,54 +13,60 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .box { background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.8rem; }
         .info-section { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; }
-        button { width: 100%; padding: 12px; border: none; background: #3182ce; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin-top: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 12px; border: none; background: #3182ce; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 <div class="card">
     <div id="ui">Loading...</div>
+    <input type="text" id="manualLoc" placeholder="Enter city manually...">
+    <button onclick="handleManual()">Use Manual Location</button>
+    <button onclick="getLocation()">Use GPS Location</button>
 </div>
 <script>
-    async function getLocData(lat, lon) {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`);
-        return await res.json();
+    async function fetchWeather(lat, lon, label = "Unknown") {
+        const geo = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`)).json();
+        const addr = geo.address || {};
+        const weather = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=sunrise,sunset&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`)).json();
+        
+        const c = weather.current;
+        const d = weather.daily;
+        document.getElementById('ui').innerHTML = `
+            <span class="label">Current Location:</span><div class="val">${label}</div>
+            <span class="label">Weather Source:</span><div class="val">Station: ${addr.town || addr.city || "Area Station"}</div>
+            <div class="temp">${Math.round(c.temperature_2m)}°F</div>
+            <div class="grid">
+                <div class="box">Humidity<br><b>${c.relative_humidity_2m}%</b></div>
+                <div class="box">Wind<br><b>${c.wind_speed_10m} mph</b></div>
+            </div>
+            <div class="grid">
+                <div class="box">Sunrise<br><b>${d.sunrise[0].split('T')[1]}</b></div>
+                <div class="box">Sunset<br><b>${d.sunset[0].split('T')[1]}</b></div>
+            </div>
+            <div class="info-section">
+                <span class="label">Additional Location Info:</span>
+                <div class="val">${addr.county || 'N/A'}, ${addr.state || 'N/A'}</div>
+            </div>
+        `;
     }
 
-    async function update() {
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const { latitude: lat, longitude: lon } = pos.coords;
-            const geo = await getLocData(lat, lon);
-            const addr = geo.address || {};
-            // Pulling weather including daily metrics
-            const weather = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=sunrise,sunset&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto`)).json();
-            
-            const c = weather.current;
-            const d = weather.daily;
-            document.getElementById('ui').innerHTML = `
-                <span class="label">Current Location:</span><div class="val">${addr.village || addr.town || addr.city || "UNKNOWN"}</div>
-                <span class="label">Weather Source:</span><div class="val">Station: ${addr.town || addr.city || "Area Station"}</div>
-                
-                <div class="temp">${Math.round(c.temperature_2m)}°F</div>
-                <div class="grid">
-                    <div class="box">Humidity<br><b>${c.relative_humidity_2m}%</b></div>
-                    <div class="box">Wind<br><b>${c.wind_speed_10m} mph</b></div>
-                </div>
-                <div class="grid">
-                    <div class="box">Sunrise<br><b>${d.sunrise[0].split('T')[1]}</b></div>
-                    <div class="box">Sunset<br><b>${d.sunset[0].split('T')[1]}</b></div>
-                </div>
-                
-                <div class="info-section">
-                    <span class="label">Additional Location Info:</span>
-                    <div class="val">${addr.county || 'N/A'}, ${addr.state || 'N/A'}</div>
-                </div>
-                
-                <button onclick="update()">Refresh</button>
-            `;
-        });
+    async function handleManual() {
+        const query = document.getElementById('manualLoc').value;
+        const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
+        if(res.length > 0) fetchWeather(res[0].lat, res[0].lon, query);
     }
-    update();
+
+    function getLocation() {
+        navigator.geolocation.getCurrentPosition(
+            (p) => fetchWeather(p.coords.latitude, p.coords.longitude, "GPS Detected"),
+            async () => {
+                const ip = await (await fetch("https://ipapi.co/json/")).json();
+                fetchWeather(ip.latitude, ip.longitude, "IP Detected");
+            }
+        );
+    }
+    getLocation();
 </script>
 </body>
 </html>
