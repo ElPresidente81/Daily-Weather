@@ -18,18 +18,10 @@
             box-sizing: border-box;
             transition: background 0.3s;
         }
-        /* Dark Mode Styles */
         body.dark-mode { background: linear-gradient(135deg, #1a202c, #2d3748); }
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
         body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val { color: #f7fafc; }
         
-        .page-title { 
-            color: #2c3e50; 
-            margin: 0 0 10px 0; 
-            font-size: 1.2rem; 
-            text-align: center; 
-            font-weight: 700;
-        }
         .card { 
             background: white; 
             padding: 20px; 
@@ -39,12 +31,14 @@
             box-sizing: border-box;
         }
         
-        /* Swap Zone: Title or Alert */
-        #statusSlot { margin-bottom: 15px; }
-        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
+        /* Header Row: Title + Toggle */
+        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .page-title { color: #2c3e50; margin: 0; font-size: 1.1rem; font-weight: 700; }
+        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
         
-        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-bottom: 5px; display: block; margin-left: auto; }
-
+        /* Alert Banner */
+        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
+        
         /* Main Weather Section */
         .main-weather {
             background: rgba(66, 153, 225, 0.1);
@@ -72,17 +66,14 @@
         .box-title { font-size: 0.7rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
         .box-val { font-size: 1rem; color: #2d3748; font-weight: 700; margin-top: 5px; }
 
-        /* SVG Gauge Styles */
         .gauge-container { width: 70px; height: 40px; position: relative; margin-top: 5px; }
         .gauge-svg { width: 100%; height: 100%; overflow: visible; }
         .gauge-bg { fill: none; stroke: #e2e8f0; stroke-width: 8; stroke-linecap: round; }
         .gauge-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease-out; }
 
-        /* Sunrise/Sunset Specific */
         .sun-box { background: rgba(237, 137, 54, 0.1); }
         .sun-icon { font-size: 1.3rem; margin: 5px 0; }
 
-        /* Forecast Styles */
         .forecast-section { margin-bottom: 15px; }
         .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
         .forecast-btn { 
@@ -110,7 +101,6 @@
         
         .hidden { display: none; }
 
-        /* Search & Controls */
         .controls { background: #f1f5f9; padding: 15px; border-radius: 16px; margin-top: 5px; }
         input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter', sans-serif; }
         input:focus { outline: none; border-color: #3182ce; }
@@ -129,12 +119,12 @@
 <body>
 
 <div class="card">
-    <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">☀️/🌙</button>
-    
-    <div id="statusSlot">
-        <h1 class="page-title" id="titleBar">Daily Weather Dashboard</h1>
-        <div id="alertBanner">⚠️ Alert: Severe Weather Detected</div>
+    <div class="header-row">
+        <h1 class="page-title">Daily Weather</h1>
+        <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">☀️/🌙</button>
     </div>
+    
+    <div id="alertBanner">⚠️ Alert: Severe Weather</div>
 
     <div id="ui">
         <div style="text-align:center; padding: 20px; color: #718096;">Fetching localized data...</div>
@@ -241,17 +231,7 @@
         const condition = getWeatherCondition(c.weathercode);
         const currentLocalHour = parseInt(c.time.substring(11, 13), 10);
 
-        // Header/Alert Swap Logic
-        const titleBar = document.getElementById('titleBar');
-        const alertBanner = document.getElementById('alertBanner');
-        if (c.weathercode >= 95) {
-            titleBar.style.display = 'none';
-            alertBanner.style.display = 'block';
-        } else {
-            titleBar.style.display = 'block';
-            alertBanner.style.display = 'none';
-        }
-        
+        document.getElementById('alertBanner').style.display = (c.weathercode >= 95) ? 'block' : 'none';
         const aqLink = `https://www.airnow.gov/?city=${displayLabel.split(',')[0]}&state=&country=USA`;
 
         // --- Build Hourly Tape ---
@@ -291,7 +271,6 @@
             `;
         }
 
-        // --- Render UI ---
         document.getElementById('ui').innerHTML = `
             <div class="main-weather">
                 <div class="condition-icon">${condition.icon}</div>
