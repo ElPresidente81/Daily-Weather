@@ -23,13 +23,16 @@
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
         body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val { color: #f7fafc; }
         
+        /* Updated: Responsive Card Width */
         .card { 
             background: white; 
             padding: 20px; 
-            width: 340px; 
+            width: 100%; 
+            max-width: 400px; /* Limits width on mobile */
             border-radius: 24px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             box-sizing: border-box;
+            transition: max-width 0.3s ease;
         }
         
         .header-row { 
@@ -149,11 +152,25 @@
             display: flex; 
             overflow-x: auto; 
             gap: 8px; 
-            padding-bottom: 5px; 
+            padding-bottom: 10px; /* Added extra padding to make room for scrollbar */
             scroll-behavior: smooth; 
         }
         
-        .scroll-container::-webkit-scrollbar { display: none; }
+        /* Updated: Sleek scrollbar for desktop users so they can scroll right */
+        .scroll-container::-webkit-scrollbar { 
+            height: 6px; 
+            display: block; 
+        }
+        .scroll-container::-webkit-scrollbar-track { 
+            background: transparent; 
+        }
+        .scroll-container::-webkit-scrollbar-thumb { 
+            background: #cbd5e1; 
+            border-radius: 10px; 
+        }
+        body.dark-mode .scroll-container::-webkit-scrollbar-thumb { 
+            background: #4a5568; 
+        }
         
         .time-block { 
             min-width: 60px; 
@@ -223,13 +240,52 @@
         
         .footer-info { margin-top: 15px; text-align: center; font-size: 0.7rem; color: #a0aec0; }
 
-        /* Tighten layout */
-.card { padding: 5px !important; }
-.main-weather { margin-bottom: 5px !important; padding: 5px !important; }
-.grid { margin-bottom: 5px !important; gap: 4px !important; }
-.box { padding: 4px !important; }
-.forecast-section { margin-bottom: 5px !important; }
-.controls { padding: 5px !important; margin-top: 5px !important; }
+        /* Mobile specific layout tightening */
+        @media (max-width: 767px) {
+            .card { padding: 5px !important; }
+            .main-weather { margin-bottom: 5px !important; padding: 5px !important; }
+            .grid { margin-bottom: 5px !important; gap: 4px !important; }
+            .box { padding: 4px !important; }
+            .forecast-section { margin-bottom: 5px !important; }
+            .controls { padding: 5px !important; margin-top: 5px !important; }
+        }
+
+        /* Desktop specific layout expansion */
+        @media (min-width: 768px) {
+            body { padding: 40px 20px; }
+            
+            .card { max-width: 850px; padding: 30px; }
+            
+            #ui { 
+                display: grid; 
+                grid-template-columns: 1fr 1.5fr; 
+                gap: 20px; 
+                align-items: stretch;
+            }
+            
+            .main-weather { 
+                margin-bottom: 0; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: center; 
+            }
+            
+            .grid { margin-bottom: 0; gap: 15px; }
+            .box { padding: 15px; }
+            
+            .forecast-section { grid-column: span 2; margin-top: 10px; }
+            .footer-info { grid-column: span 2; }
+            
+            .controls { 
+                display: flex; 
+                gap: 15px; 
+                align-items: center; 
+                padding: 20px;
+            }
+            
+            .controls input { flex: 2; margin-bottom: 0; }
+            .button-row { flex: 3; margin-top: 0; }
+        }
         
     </style>
 </head>
@@ -244,7 +300,7 @@
     <div id="alertBanner">⚠️ Alert: Severe Weather</div>
 
     <div id="ui">
-        <div style="text-align:center; padding: 20px; color: #718096;">Fetching localized data...</div>
+        <div style="text-align:center; padding: 20px; color: #718096; grid-column: span 2;">Fetching localized data...</div>
     </div>
     
     <div class="controls">
