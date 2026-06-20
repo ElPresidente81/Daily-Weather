@@ -12,14 +12,14 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 15px 10px 40px; /* Reduced top padding to 15px */
+            padding: 15px 10px 40px; 
             margin: 0;
             min-height: 100vh;
             box-sizing: border-box;
         }
         .page-title { 
             color: #2c3e50; 
-            margin-top: 0; /* Removed top margin */
+            margin-top: 0; 
             margin-bottom: 15px; 
             font-size: 1.6rem; 
             text-align: center; 
@@ -27,7 +27,7 @@
         }
         .card { 
             background: white; 
-            padding: 20px; /* Slightly tighter padding for mobile */
+            padding: 20px; 
             width: 340px; 
             border-radius: 24px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
@@ -71,26 +71,32 @@
         .sun-box { background: rgba(237, 137, 54, 0.1); }
         .sun-icon { font-size: 1.3rem; margin: 5px 0; }
 
-        /* Hourly Forecast Styles */
-        .hourly-section { margin-bottom: 15px; }
-        .hourly-btn { 
-            width: 100%; padding: 10px; background: #edf2f7; color: #4a5568; 
+        /* Forecast (Hourly/Weekly) Styles */
+        .forecast-section { margin-bottom: 15px; }
+        .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .forecast-btn { 
+            flex: 1; padding: 10px; background: #edf2f7; color: #4a5568; 
             border: none; border-radius: 12px; font-weight: 700; cursor: pointer; 
-            transition: background 0.2s; font-size: 0.85rem;
+            transition: background 0.2s; font-size: 0.8rem;
         }
-        .hourly-btn:hover { background: #e2e8f0; }
-        .hourly-scroll { 
-            display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; 
+        .forecast-btn:hover { background: #e2e8f0; }
+        .forecast-btn.active-close { background: #cbd5e1; color: #2d3748; }
+
+        .scroll-container { 
+            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; 
             scroll-behavior: smooth; 
         }
-        .hourly-scroll::-webkit-scrollbar { display: none; } /* Hide scrollbar for a clean look */
-        .hour-block { 
+        .scroll-container::-webkit-scrollbar { display: none; }
+        .time-block { 
             min-width: 60px; text-align: center; background: #f8fafc; 
             padding: 10px 5px; border-radius: 12px; border: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .hour-block.current { background: #3182ce; color: white; border-color: #3182ce; }
-        .hour-time { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
-        .hour-temp { font-size: 1rem; font-weight: 700; }
+        .time-block.current { background: #3182ce; color: white; border-color: #3182ce; }
+        .block-label { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        .block-val { font-size: 1rem; font-weight: 700; }
+        .block-icon { font-size: 1.2rem; margin: 2px 0; }
+        
         .hidden { display: none; }
 
         /* Search & Controls Section */
@@ -172,19 +178,34 @@
         `;
     }
 
-    // Toggles the hourly tape and smoothly scrolls to the current hour
-    window.toggleHourly = function() {
-        const container = document.getElementById('hourlyScrollContainer');
-        if (container.classList.contains('hidden')) {
-            container.classList.remove('hidden');
-            const targetId = container.getAttribute('data-current-hour-id');
+    // Handles toggling and updating the buttons for the forecast panels
+    window.toggleForecast = function(type) {
+        const hContainer = document.getElementById('hourlyContainer');
+        const wContainer = document.getElementById('weeklyContainer');
+        const btnRow = document.getElementById('forecast-btn-container');
+
+        if (type === 'hourly') {
+            hContainer.classList.remove('hidden');
+            wContainer.classList.add('hidden');
+            btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Hourly Forecast ✖</button>`;
+            
+            // Auto-scroll to current hour
+            const targetId = hContainer.getAttribute('data-current-hour-id');
             const currentHourEl = document.getElementById(targetId);
-            if (currentHourEl) {
-                // Smoothly scroll the element to the center of the scrollable container
-                currentHourEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            }
+            if (currentHourEl) currentHourEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            
+        } else if (type === 'weekly') {
+            wContainer.classList.remove('hidden');
+            hContainer.classList.add('hidden');
+            btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Weekly Forecast ✖</button>`;
+            
         } else {
-            container.classList.add('hidden');
+            hContainer.classList.add('hidden');
+            wContainer.classList.add('hidden');
+            btnRow.innerHTML = `
+                <button class="forecast-btn" onclick="toggleForecast('hourly')">Hourly</button>
+                <button class="forecast-btn" onclick="toggleForecast('weekly')">7-Day</button>
+            `;
         }
     };
 
@@ -199,8 +220,8 @@
             } catch (e) { console.log("Reverse geocode failed."); }
         }
 
-        // Added hourly=temperature_2m to the API call
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+        // Added weathercode to the daily query for the 7-day icons
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
         const weather = await (await fetch(url)).json();
         
         const c = weather.current;
@@ -208,28 +229,47 @@
         const h = weather.hourly;
         const condition = getWeatherCondition(c.weathercode);
 
-        // Extract the exact hour from the API's localized current time (format: YYYY-MM-DDTHH:MM)
+        // --- Build Hourly Tape ---
         const currentLocalHour = parseInt(c.time.substring(11, 13), 10);
-
-        // Build the 24-hour tape HTML
         let hourlyHTML = '';
         for(let i = 0; i < 24; i++) {
-            // Convert index to 12-hour format string (e.g., "2 PM")
             let displayHour = i === 0 ? 12 : (i > 12 ? i - 12 : i);
             let ampm = i < 12 ? 'AM' : 'PM';
-            let timeStr = `${displayHour} ${ampm}`;
-            
             let isCurrent = i === currentLocalHour;
-            let currentClass = isCurrent ? 'current' : '';
             
             hourlyHTML += `
-                <div class="hour-block ${currentClass}" id="hour-block-${i}">
-                    <div class="hour-time">${timeStr}</div>
-                    <div class="hour-temp">${Math.round(h.temperature_2m[i])}°</div>
+                <div class="time-block ${isCurrent ? 'current' : ''}" id="hour-block-${i}">
+                    <div class="block-label">${displayHour} ${ampm}</div>
+                    <div class="block-val">${Math.round(h.temperature_2m[i])}°</div>
                 </div>
             `;
         }
 
+        // --- Build Weekly Tape ---
+        let weeklyHTML = '';
+        // Open-Meteo provides 7 days of daily data by default
+        for(let i = 0; i < d.time.length; i++) {
+            // Create a local date object, correcting for timezone shifts
+            let dateStr = d.time[i] + 'T12:00:00'; 
+            let dateObj = new Date(dateStr);
+            let dayName = dateObj.toLocaleDateString('en-US', {weekday: 'short'}); // "Mon", "Tue"
+            if (i === 0) dayName = "Today";
+
+            let dayCond = getWeatherCondition(d.weathercode[i]);
+            
+            weeklyHTML += `
+                <div class="time-block">
+                    <div class="block-label">${dayName}</div>
+                    <div class="block-icon">${dayCond.icon}</div>
+                    <div class="block-val" style="font-size: 0.8rem; display: flex; gap: 5px;">
+                        <span style="color:#e67a22">${Math.round(d.temperature_2m_max[i])}°</span>
+                        <span style="color:#718096">${Math.round(d.temperature_2m_min[i])}°</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Render UI ---
         document.getElementById('ui').innerHTML = `
             <div class="main-weather">
                 <div class="condition-icon">${condition.icon}</div>
@@ -264,12 +304,18 @@
                 </div>
             </div>
 
-            <div class="hourly-section">
-                <button class="hourly-btn" onclick="toggleHourly()">View Hourly Forecast</button>
-                <div id="hourlyScrollContainer" class="hidden" data-current-hour-id="hour-block-${currentLocalHour}">
-                    <div class="hourly-scroll">
-                        ${hourlyHTML}
-                    </div>
+            <div class="forecast-section">
+                <div id="forecast-btn-container" class="forecast-btn-row">
+                    <button class="forecast-btn" onclick="toggleForecast('hourly')">Hourly</button>
+                    <button class="forecast-btn" onclick="toggleForecast('weekly')">7-Day</button>
+                </div>
+                
+                <div id="hourlyContainer" class="hidden" data-current-hour-id="hour-block-${currentLocalHour}">
+                    <div class="scroll-container">${hourlyHTML}</div>
+                </div>
+                
+                <div id="weeklyContainer" class="hidden">
+                    <div class="scroll-container">${weeklyHTML}</div>
                 </div>
             </div>
 
