@@ -25,9 +25,8 @@
         
         .page-title { 
             color: #2c3e50; 
-            margin-top: 0; 
-            margin-bottom: 15px; 
-            font-size: 1.6rem; 
+            margin: 0 0 10px 0; 
+            font-size: 1.2rem; 
             text-align: center; 
             font-weight: 700;
         }
@@ -40,8 +39,10 @@
             box-sizing: border-box;
         }
         
-        /* New: Alert Banner */
-        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
+        /* Swap Zone: Title or Alert */
+        #statusSlot { margin-bottom: 15px; }
+        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
+        
         .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-bottom: 5px; display: block; margin-left: auto; }
 
         /* Main Weather Section */
@@ -81,7 +82,7 @@
         .sun-box { background: rgba(237, 137, 54, 0.1); }
         .sun-icon { font-size: 1.3rem; margin: 5px 0; }
 
-        /* Forecast (Hourly/Weekly) Styles */
+        /* Forecast Styles */
         .forecast-section { margin-bottom: 15px; }
         .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
         .forecast-btn { 
@@ -109,7 +110,7 @@
         
         .hidden { display: none; }
 
-        /* Search & Controls Section */
+        /* Search & Controls */
         .controls { background: #f1f5f9; padding: 15px; border-radius: 16px; margin-top: 5px; }
         input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter', sans-serif; }
         input:focus { outline: none; border-color: #3182ce; }
@@ -127,11 +128,14 @@
 </head>
 <body>
 
-<h1 class="page-title">Daily Weather Dashboard</h1>
-
 <div class="card">
     <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">☀️/🌙</button>
-    <div id="alertBanner">⚠️ Alert: Severe Weather Detected</div>
+    
+    <div id="statusSlot">
+        <h1 class="page-title" id="titleBar">Daily Weather Dashboard</h1>
+        <div id="alertBanner">⚠️ Alert: Severe Weather Detected</div>
+    </div>
+
     <div id="ui">
         <div style="text-align:center; padding: 20px; color: #718096;">Fetching localized data...</div>
     </div>
@@ -237,8 +241,17 @@
         const condition = getWeatherCondition(c.weathercode);
         const currentLocalHour = parseInt(c.time.substring(11, 13), 10);
 
-        // New: Alert and Air Quality Logic
-        document.getElementById('alertBanner').style.display = (c.weathercode >= 95) ? 'block' : 'none';
+        // Header/Alert Swap Logic
+        const titleBar = document.getElementById('titleBar');
+        const alertBanner = document.getElementById('alertBanner');
+        if (c.weathercode >= 95) {
+            titleBar.style.display = 'none';
+            alertBanner.style.display = 'block';
+        } else {
+            titleBar.style.display = 'block';
+            alertBanner.style.display = 'none';
+        }
+        
         const aqLink = `https://www.airnow.gov/?city=${displayLabel.split(',')[0]}&state=&country=USA`;
 
         // --- Build Hourly Tape ---
