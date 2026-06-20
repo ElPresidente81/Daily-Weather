@@ -342,7 +342,6 @@
         document.getElementById('alertBanner').style.display = (c.weathercode >= 95) ? 'block' : 'none';
         const aqLink = `https://www.airnow.gov/?city=${displayLabel.split(',')[0]}&state=&country=USA`;
 
-        // --- Build Hourly Tape ---
         let hourlyHTML = '';
         for(let i = 0; i < 24; i++) {
             let displayHour = i === 0 ? 12 : (i > 12 ? i - 12 : i);
@@ -357,7 +356,6 @@
             `;
         }
 
-        // --- Build Weekly Tape ---
         let weeklyHTML = '';
         for(let i = 0; i < d.time.length; i++) {
             let dateStr = d.time[i] + 'T12:00:00'; 
