@@ -4,36 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         body { 
-            font-family: sans-serif; 
-            background: #f4f7f6; 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #e0eafc, #cfdef3); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding-top: 40px; 
+            padding: 40px 10px; 
             margin: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .page-title { 
-            color: #2d3748; 
+            color: #2c3e50; 
             margin-bottom: 20px; 
             font-size: 1.8rem; 
             text-align: center; 
+            font-weight: 700;
         }
-        .card { background: white; padding: 25px; width: 320px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .label { font-size: 0.7rem; color: #777; font-weight: bold; text-transform: uppercase; margin-top: 15px; display: block; }
-        .val { font-size: 1rem; color: #333; font-weight: 600; margin-bottom: 5px; }
-        .temp { font-size: 4rem; font-weight: bold; text-align: center; margin: 20px 0; color: #2d3748; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .box { background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.8rem; }
-        .footer-info { margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; font-size: 0.75rem; color: #888; }
-        input { width: 100%; padding: 10px; margin-top: 15px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; }
-        button { width: 100%; padding: 10px; border: none; background: #3182ce; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .card { 
+            background: white; 
+            padding: 25px; 
+            width: 340px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            box-sizing: border-box;
+        }
         
-        /* Side-by-side buttons */
-        .button-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 10px; }
-        .button-row button { width: 45%; margin-top: 0; padding: 10px 5px; font-size: 0.85rem; }
-        .or-label { font-size: 0.8rem; color: #888; font-weight: bold; }
+        /* Main Weather Section */
+        .main-weather {
+            background: rgba(66, 153, 225, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .condition-icon { font-size: 3rem; margin-bottom: -10px; }
+        .temp { font-size: 4.5rem; font-weight: 700; color: #2d3748; line-height: 1; margin: 10px 0; letter-spacing: -2px; }
+        .condition-text { font-size: 1.1rem; color: #4a5568; font-weight: 500; }
+
+        /* Gauges & Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .box { 
+            background: #f8fafc; 
+            padding: 15px 10px; 
+            border-radius: 16px; 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .box-title { font-size: 0.75rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .box-val { font-size: 1.1rem; color: #2d3748; font-weight: 700; margin-top: 5px; }
+
+        /* SVG Gauge Styles */
+        .gauge-container { width: 80px; height: 45px; position: relative; margin-top: 5px; }
+        .gauge-svg { width: 100%; height: 100%; overflow: visible; }
+        .gauge-bg { fill: none; stroke: #e2e8f0; stroke-width: 8; stroke-linecap: round; }
+        .gauge-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease-out; }
+
+        /* Sunrise/Sunset Specific */
+        .sun-box { background: rgba(237, 137, 54, 0.1); }
+        .sun-icon { font-size: 1.5rem; margin: 5px 0; }
+
+        /* Search & Controls Section */
+        .controls { background: #f1f5f9; padding: 15px; border-radius: 16px; margin-top: 10px; }
+        input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter', sans-serif; }
+        input:focus { outline: none; border-color: #3182ce; }
+        .button-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 8px; }
+        .button-row button { 
+            flex: 1; 
+            padding: 10px 5px; 
+            border: none; 
+            background: #3182ce; 
+            color: white; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .button-row button:hover { background: #2b6cb0; }
+        .or-label { font-size: 0.75rem; color: #a0aec0; font-weight: 700; }
+        
+        .footer-info { margin-top: 20px; text-align: center; font-size: 0.75rem; color: #a0aec0; }
     </style>
 </head>
 <body>
@@ -41,61 +98,151 @@
 <h1 class="page-title">Daily Weather Dashboard</h1>
 
 <div class="card">
-    <div id="ui">Loading...</div>
-    <input type="text" id="manualLoc" placeholder="Enter city, zip, or GPS...">
+    <div id="ui">
+        <div style="text-align:center; padding: 20px; color: #718096;">Fetching localized data...</div>
+    </div>
     
-    <div class="button-row">
-        <button onclick="handleManual()">Search Location</button>
-        <span class="or-label">OR</span>
-        <button onclick="getLocation()">Use Current GPS Location</button>
+    <div class="controls">
+        <input type="text" id="manualLoc" placeholder="Enter city, zip, or GPS...">
+        <div class="button-row">
+            <button onclick="handleManual()">Search Location</button>
+            <span class="or-label">OR</span>
+            <button onclick="getLocation()">Use Current GPS</button>
+        </div>
     </div>
 </div>
 
 <script>
+    // Translates WMO weather codes into text and icons
+    function getWeatherCondition(code) {
+        const map = {
+            0: { text: "Clear Sky", icon: "☀️" },
+            1: { text: "Mainly Clear", icon: "🌤️" },
+            2: { text: "Partly Cloudy", icon: "⛅" },
+            3: { text: "Overcast", icon: "☁️" },
+            45: { text: "Fog", icon: "🌫️" },
+            48: { text: "Depositing Rime Fog", icon: "🌫️" },
+            51: { text: "Light Drizzle", icon: "🌧️" },
+            53: { text: "Moderate Drizzle", icon: "🌧️" },
+            55: { text: "Dense Drizzle", icon: "🌧️" },
+            61: { text: "Slight Rain", icon: "🌦️" },
+            63: { text: "Moderate Rain", icon: "🌧️" },
+            65: { text: "Heavy Rain", icon: "🌧️" },
+            71: { text: "Slight Snow", icon: "🌨️" },
+            73: { text: "Moderate Snow", icon: "❄️" },
+            75: { text: "Heavy Snow", icon: "❄️" },
+            95: { text: "Thunderstorm", icon: "⛈️" }
+        };
+        return map[code] || { text: "Unknown", icon: "🌡️" };
+    }
+
+    // Generates the SVG HTML for a solid semi-circle gauge
+    function createGauge(val, min, max, color) {
+        // Constrain percentage between 0 and 1
+        let percent = (val - min) / (max - min);
+        if (percent < 0) percent = 0;
+        if (percent > 1) percent = 1;
+        
+        // Math for SVG arc path (radius 35)
+        const circumference = Math.PI * 35; // ~109.95
+        const offset = circumference * (1 - percent);
+
+        return `
+            <div class="gauge-container">
+                <svg class="gauge-svg" viewBox="0 0 100 50">
+                    <path class="gauge-bg" d="M 15 45 A 35 35 0 0 1 85 45" />
+                    <path class="gauge-fill" d="M 15 45 A 35 35 0 0 1 85 45" 
+                          stroke="${color}" 
+                          stroke-dasharray="${circumference}" 
+                          stroke-dashoffset="${offset}" />
+                </svg>
+            </div>
+        `;
+    }
+
     async function fetchWeather(lat, lon, label) {
-        const geo = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`)).json();
-        const addr = geo.address || {};
-        const weather = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=sunrise,sunset&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`)).json();
+        // Fetch location name fallback if using raw coordinates
+        let displayLabel = label;
+        if (label === "GPS Detected" || label === "IP Detected") {
+            try {
+                const geo = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`)).json();
+                if (geo.address && (geo.address.city || geo.address.town || geo.address.county)) {
+                    displayLabel = geo.address.city || geo.address.town || geo.address.county;
+                }
+            } catch (e) { console.log("Reverse geocode failed."); }
+        }
+
+        // Updated API call to include max/min temps and weather conditions
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+        const weather = await (await fetch(url)).json();
         
         const c = weather.current;
         const d = weather.daily;
+        const condition = getWeatherCondition(c.weathercode);
+
+        // Render the Dashboard UI
         document.getElementById('ui').innerHTML = `
-            <div class="temp">${Math.round(c.temperature_2m)}°F</div>
-            <div class="grid">
-                <div class="box">Humidity<br><b>${c.relative_humidity_2m}%</b></div>
-                <div class="box">Wind<br><b>${c.wind_speed_10m} mph</b></div>
+            <div class="main-weather">
+                <div class="condition-icon">${condition.icon}</div>
+                <div class="temp">${Math.round(c.temperature_2m)}°</div>
+                <div class="condition-text">${condition.text}</div>
             </div>
+
             <div class="grid">
-                <div class="box">Sunrise<br><b>${d.sunrise[0].split('T')[1]}</b></div>
-                <div class="box">Sunset<br><b>${d.sunset[0].split('T')[1]}</b></div>
+                <div class="box">
+                    <div class="box-title">Today's Range</div>
+                    ${createGauge(c.temperature_2m, d.temperature_2m_min[0], d.temperature_2m_max[0], "#ed8936")}
+                    <div class="box-val">${Math.round(d.temperature_2m_min[0])}° - ${Math.round(d.temperature_2m_max[0])}°</div>
+                </div>
+
+                <div class="box">
+                    <div class="box-title">Humidity 💧</div>
+                    ${createGauge(c.relative_humidity_2m, 0, 100, "#4299e1")}
+                    <div class="box-val">${c.relative_humidity_2m}%</div>
+                </div>
+
+                <div class="box">
+                    <div class="box-title">Wind 💨</div>
+                    ${createGauge(c.wind_speed_10m, 0, 40, "#9f7aea")}
+                    <div class="box-val">${c.wind_speed_10m} mph</div>
+                </div>
+
+                <div class="box sun-box">
+                    <div class="box-title">Sun Cycle</div>
+                    <div class="sun-icon">🌅</div>
+                    <div class="box-val" style="font-size: 0.9rem;">
+                        ${d.sunrise[0].split('T')[1]} <br> 
+                        <span style="color: #718096; font-size: 0.75rem;">to</span> <br> 
+                        ${d.sunset[0].split('T')[1]}
+                    </div>
+                </div>
             </div>
+
             <div class="footer-info">
-                <div>Location: ${label}</div>
-                <div>Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}</div>
+                📍 <b>${displayLabel}</b> <br>
+                Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}
             </div>
         `;
     }
 
     async function handleManual() {
         const query = document.getElementById('manualLoc').value.trim();
+        if (!query) return;
 
-        // 1. Check if the input matches DDM GPS format (e.g., N 39° 00.476 W 084° 08.750)
+        // GPS Check Logic (DDM Format)
         const ddmRegex = /([NS])\s*(\d+)°?\s*([\d.]+)\s*([EW])\s*(\d+)°?\s*([\d.]+)/i;
         const match = query.match(ddmRegex);
         
         if (match) {
-            // Convert Degrees and Minutes to standard decimal format
             let lat = Number(match[2]) + (Number(match[3]) / 60);
             if (match[1].toUpperCase() === 'S') lat = -lat;
-            
             let lon = Number(match[5]) + (Number(match[6]) / 60);
             if (match[4].toUpperCase() === 'W') lon = -lon;
-            
             fetchWeather(lat, lon, query);
-            return; // Exit early since we successfully parsed coordinates
+            return;
         }
 
-        // 2. Fallback to standard text search for cities/zips
+        // Standard Text Search
         const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
         if(res.length > 0) {
             fetchWeather(res[0].lat, res[0].lon, query);
@@ -114,6 +261,8 @@
             }
         );
     }
+    
+    // Auto-load on start
     getLocation();
 </script>
 </body>
