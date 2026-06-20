@@ -15,9 +15,10 @@
             padding: 15px 10px 40px; 
             margin: 0;
             min-height: 100vh;
-            box-sizing: border-box;
+            box-sizing: border-box; 
             transition: background 0.3s;
         }
+        
         body.dark-mode { background: linear-gradient(135deg, #1a202c, #2d3748); }
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
         body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val { color: #f7fafc; }
@@ -31,15 +32,39 @@
             box-sizing: border-box;
         }
         
-        /* Header Row: Title + Toggle */
-        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-        .page-title { color: #2c3e50; margin: 0; font-size: 1.1rem; font-weight: 700; }
-        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+        .header-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 15px; 
+        }
         
-        /* Alert Banner */
-        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
+        .page-title { 
+            color: #2c3e50; 
+            margin: 0; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+        }
         
-        /* Main Weather Section */
+        .theme-btn { 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.2rem; 
+        }
+        
+        #alertBanner { 
+            background: #e53e3e; 
+            color: white; 
+            padding: 10px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            font-size: 0.8rem; 
+            text-align: center; 
+            display: none; 
+            font-weight: 700; 
+        }
+        
         .main-weather {
             background: rgba(66, 153, 225, 0.1);
             border-radius: 16px;
@@ -47,12 +72,27 @@
             text-align: center;
             margin-bottom: 15px;
         }
+        
         .condition-icon { font-size: 2.5rem; margin-bottom: -10px; }
-        .temp { font-size: 4rem; font-weight: 700; color: #2d3748; line-height: 1; margin: 10px 0; letter-spacing: -2px; }
+        
+        .temp { 
+            font-size: 4rem; 
+            font-weight: 700; 
+            color: #2d3748; 
+            line-height: 1; 
+            margin: 10px 0; 
+            letter-spacing: -2px; 
+        }
+        
         .condition-text { font-size: 1rem; color: #4a5568; font-weight: 500; }
 
-        /* Gauges & Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+        
         .box { 
             background: #f8fafc; 
             padding: 12px 8px; 
@@ -63,7 +103,16 @@
             align-items: center;
             justify-content: space-between;
         }
-        .box-title { font-size: 0.7rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        
+        .box-title { 
+            font-size: 0.7rem; 
+            color: #718096; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            margin-bottom: 5px; 
+        }
+        
         .box-val { font-size: 1rem; color: #2d3748; font-weight: 700; margin-top: 5px; }
 
         .gauge-container { width: 70px; height: 40px; position: relative; margin-top: 5px; }
@@ -72,45 +121,104 @@
         .gauge-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease-out; }
 
         .sun-box { background: rgba(237, 137, 54, 0.1); }
+        
         .sun-icon { font-size: 1.3rem; margin: 5px 0; }
 
         .forecast-section { margin-bottom: 15px; }
+        
         .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        
         .forecast-btn { 
-            flex: 1; padding: 10px; background: #edf2f7; color: #4a5568; 
-            border: none; border-radius: 12px; font-weight: 700; cursor: pointer; 
-            transition: background 0.2s; font-size: 0.8rem;
+            flex: 1; 
+            padding: 10px; 
+            background: #edf2f7; 
+            color: #4a5568; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            font-size: 0.8rem; 
         }
+        
         .forecast-btn:hover { background: #e2e8f0; }
+        
         .forecast-btn.active-close { background: #cbd5e1; color: #2d3748; }
 
         .scroll-container { 
-            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 8px; 
+            padding-bottom: 5px; 
             scroll-behavior: smooth; 
         }
+        
         .scroll-container::-webkit-scrollbar { display: none; }
+        
         .time-block { 
-            min-width: 60px; text-align: center; background: #f8fafc; 
-            padding: 10px 5px; border-radius: 12px; border: 1px solid #e2e8f0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-width: 60px; 
+            text-align: center; 
+            background: #f8fafc; 
+            padding: 10px 5px; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
         }
+        
         .time-block.current { background: #3182ce; color: white; border-color: #3182ce; }
+        
         .block-label { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        
         .block-val { font-size: 1rem; font-weight: 700; }
+        
         .block-icon { font-size: 1.2rem; margin: 2px 0; }
         
         .hidden { display: none; }
 
-        .controls { background: #f1f5f9; padding: 15px; border-radius: 16px; margin-top: 5px; }
-        input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter', sans-serif; }
-        input:focus { outline: none; border-color: #3182ce; }
-        .button-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 8px; }
-        .button-row button { 
-            flex: 1; padding: 10px 5px; border: none; background: #3182ce; 
-            color: white; border-radius: 8px; cursor: pointer; font-weight: 600; 
-            font-size: 0.8rem; transition: background 0.2s;
+        .controls { 
+            background: #f1f5f9; 
+            padding: 15px; 
+            border-radius: 16px; 
+            margin-top: 5px; 
         }
+        
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        input:focus { outline: none; border-color: #3182ce; }
+        
+        .button-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-top: 12px; 
+            gap: 8px; 
+        }
+        
+        .button-row button { 
+            flex: 1; 
+            padding: 10px 5px; 
+            border: none; 
+            background: #3182ce; 
+            color: white; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            transition: background 0.2s; 
+        }
+        
         .button-row button:hover { background: #2b6cb0; }
+        
         .or-label { font-size: 0.75rem; color: #a0aec0; font-weight: 700; }
         
         .footer-info { margin-top: 15px; text-align: center; font-size: 0.7rem; color: #a0aec0; }
