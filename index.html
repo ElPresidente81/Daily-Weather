@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding-top: 50px; }
+        body { 
+            font-family: sans-serif; 
+            background: #f4f7f6; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 40px; 
+            margin: 0;
+        }
+        .page-title { 
+            color: #2d3748; 
+            margin-bottom: 20px; 
+            font-size: 1.8rem; 
+            text-align: center; 
+        }
         .card { background: white; padding: 25px; width: 320px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .label { font-size: 0.7rem; color: #777; font-weight: bold; text-transform: uppercase; margin-top: 15px; display: block; }
         .val { font-size: 1rem; color: #333; font-weight: 600; margin-bottom: 5px; }
@@ -15,15 +29,28 @@
         .footer-info { margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; font-size: 0.75rem; color: #888; }
         input { width: 100%; padding: 10px; margin-top: 15px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; }
         button { width: 100%; padding: 10px; border: none; background: #3182ce; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        
+        /* Side-by-side buttons */
+        .button-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 10px; }
+        .button-row button { width: 45%; margin-top: 0; padding: 10px 5px; font-size: 0.85rem; }
+        .or-label { font-size: 0.8rem; color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
+
+<h1 class="page-title">Daily Weather Dashboard</h1>
+
 <div class="card">
     <div id="ui">Loading...</div>
-    <input type="text" id="manualLoc" placeholder="Enter city or zip...">
-    <button onclick="handleManual()">Search Location</button>
-    <button onclick="getLocation()">Use GPS Location</button>
+    <input type="text" id="manualLoc" placeholder="Enter city, zip, or GPS...">
+    
+    <div class="button-row">
+        <button onclick="handleManual()">Search Location</button>
+        <span class="or-label">OR</span>
+        <button onclick="getLocation()">Use Current GPS Location</button>
+    </div>
 </div>
+
 <script>
     async function fetchWeather(lat, lon, label) {
         const geo = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`)).json();
@@ -44,15 +71,37 @@
             </div>
             <div class="footer-info">
                 <div>Location: ${label}</div>
-                <div>Coords: ${lat.toFixed(4)}, ${lon.toFixed(4)}</div>
+                <div>Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}</div>
             </div>
         `;
     }
 
     async function handleManual() {
-        const query = document.getElementById('manualLoc').value;
+        const query = document.getElementById('manualLoc').value.trim();
+
+        // 1. Check if the input matches DDM GPS format (e.g., N 39° 00.476 W 084° 08.750)
+        const ddmRegex = /([NS])\s*(\d+)°?\s*([\d.]+)\s*([EW])\s*(\d+)°?\s*([\d.]+)/i;
+        const match = query.match(ddmRegex);
+        
+        if (match) {
+            // Convert Degrees and Minutes to standard decimal format
+            let lat = Number(match[2]) + (Number(match[3]) / 60);
+            if (match[1].toUpperCase() === 'S') lat = -lat;
+            
+            let lon = Number(match[5]) + (Number(match[6]) / 60);
+            if (match[4].toUpperCase() === 'W') lon = -lon;
+            
+            fetchWeather(lat, lon, query);
+            return; // Exit early since we successfully parsed coordinates
+        }
+
+        // 2. Fallback to standard text search for cities/zips
         const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
-        if(res.length > 0) fetchWeather(res[0].lat, res[0].lon, query);
+        if(res.length > 0) {
+            fetchWeather(res[0].lat, res[0].lon, query);
+        } else {
+            alert("Location not found. Please try a valid city, zip code, or GPS coordinate.");
+        }
     }
 
     function getLocation() {
