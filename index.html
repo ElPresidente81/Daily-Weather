@@ -4,196 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #e0eafc, #cfdef3); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 20px 10px 40px; 
-            margin: 0;
-            min-height: 100vh;
-            box-sizing: border-box; 
-            transition: background 0.3s;
-        }
-        
-        body.dark-mode { background: linear-gradient(135deg, #1a202c, #2d3748); }
-        body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
-        body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val, body.dark-mode .location-text { color: #f7fafc; }
-        
-        .card { 
-            background: white; 
-            padding: 15px; 
-            width: 100%; 
-            max-width: 360px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-        
-        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .page-title { color: #2c3e50; margin: 0; font-size: 1.1rem; font-weight: 700; }
-        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
-        
-        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
-        
-        .main-weather { background: rgba(66, 153, 225, 0.1); border-radius: 16px; padding: 15px; text-align: center; margin-bottom: 10px; }
-        .condition-icon { font-size: 2.5rem; margin-bottom: -10px; }
-        .temp { font-size: 4rem; font-weight: 700; color: #2d3748; line-height: 1; margin: 10px 0; letter-spacing: -2px; }
-        .condition-text { font-size: 1rem; color: #4a5568; font-weight: 500; }
-
+        body { font-family: sans-serif; background: #e0eafc; display: flex; justify-content: center; padding: 10px; margin: 0; min-height: 100vh; transition: background 0.3s; }
+        body.dark-mode { background: #1a202c; }
+        body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border: 1px solid #4a5568; }
+        .card { background: white; padding: 15px; width: 100%; max-width: 360px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        #alertBanner { background: #e53e3e; color: white; padding: 5px; border-radius: 8px; margin-bottom: 10px; font-size: 0.7rem; text-align: center; display: none; }
+        .main-weather { text-align: center; margin-bottom: 10px; }
+        .temp { font-size: 3rem; font-weight: 700; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .box { background: #f8fafc; padding: 10px 8px; border-radius: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-        .box-title { font-size: 0.7rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .box-val { font-size: 1rem; color: #2d3748; font-weight: 700; margin-top: 5px; }
-
-        .gauge-container { width: 70px; height: 40px; position: relative; margin-top: 5px; }
-        .gauge-svg { width: 100%; height: 100%; overflow: visible; }
-        .gauge-bg { fill: none; stroke: #e2e8f0; stroke-width: 8; stroke-linecap: round; }
-        .gauge-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease-out; }
-
-        .sun-box { background: rgba(237, 137, 54, 0.1); }
-        .sun-icon { font-size: 1.3rem; margin: 5px 0; }
-
-        .forecast-section { margin-bottom: 10px; }
+        .box { background: #f8fafc; padding: 8px; border-radius: 12px; text-align: center; }
+        .box-title { font-size: 0.6rem; color: #718096; text-transform: uppercase; }
+        .box-val { font-size: 0.85rem; font-weight: 700; }
         .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 8px; }
-        .forecast-btn, .pill { flex: 1; padding: 10px; background: #edf2f7; color: #4a5568; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-size: 0.8rem; text-align: center; text-decoration: none; display: block;}
-        .forecast-btn:hover { background: #e2e8f0; }
-        .link-pill:hover { background: #e2e8f0; }
-        .forecast-btn.active-close { background: #cbd5e1; color: #2d3748; }
-
-        .scroll-container { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; scroll-behavior: smooth; cursor: grab; }
-        .scroll-container:active { cursor: grabbing; }
-        .time-block { min-width: 60px; text-align: center; background: #f8fafc; padding: 10px 5px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .time-block.current { background: #3182ce; color: white; border-color: #3182ce; }
-        .block-label { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
-        .block-val { font-size: 1rem; font-weight: 700; }
-        .block-icon { font-size: 1.2rem; margin: 2px 0; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.75rem; background: #edf2f7; color: #4a5568; }
+        .btn:hover { background: #e2e8f0; }
+        .scroll-container { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 5px; }
+        .time-block { min-width: 50px; text-align: center; background: #f8fafc; padding: 5px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .hidden { display: none; }
-
-        .controls { background: #f1f5f9; padding: 12px; border-radius: 16px; margin-top: 10px; }
-        input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter', sans-serif; }
-        input:focus { outline: none; border-color: #3182ce; }
-        .button-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 8px; }
-        .button-row button { flex: 1; padding: 10px 5px; border: none; background: #3182ce; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: background 0.2s; }
-        .button-row button:hover { background: #2b6cb0; }
-        .or-label { font-size: 0.75rem; color: #a0aec0; font-weight: 700; }
-        
-        .footer-info { margin-top: 15px; }
-        .pill-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
-        .location-line { font-size: 0.85rem; color: #718096; font-weight: 600; text-align: center; display: flex; justify-content: center; gap: 10px; }
-
-        @media (min-width: 600px) {
-            .card { max-width: 600px; padding: 25px; }
-            .grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
-            .temp { font-size: 5rem; }
-        }
+        .controls { background: #f1f5f9; padding: 10px; border-radius: 12px; margin-top: 10px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 8px; }
+        .button-row { display: flex; gap: 5px; align-items: center; }
+        .button-row button { flex: 1; padding: 8px; border: none; background: #3182ce; color: white; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
+        .pill-container { display: flex; gap: 6px; margin-bottom: 8px; justify-content: center; }
+        .pill { padding: 5px 10px; background: #edf2f7; border-radius: 15px; font-size: 0.7rem; text-decoration: none; color: #4a5568; }
+        .pill:hover { background: #e2e8f0; }
+        .location-line { font-size: 0.75rem; color: #718096; text-align: center; }
     </style>
 </head>
 <body>
 <div class="card">
     <div class="header-row">
-        <h1 class="page-title">Daily Weather</h1>
-        <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">☀️/🌙</button>
+        <h1 style="font-size: 1rem; margin:0">Weather</h1>
+        <button onclick="document.body.classList.toggle('dark-mode')" style="border:none; cursor:pointer">☀️/🌙</button>
     </div>
     <div id="alertBanner">⚠️ Alert: Severe Weather</div>
-    <div id="ui"><div style="text-align:center; padding: 20px; color: #718096;">Fetching localized data...</div></div>
+    <div id="ui">Fetching...</div>
     <div class="controls">
-        <input type="text" id="manualLoc" placeholder="Enter city, zip, or GPS...">
+        <input type="text" id="manualLoc" placeholder="City or Zip...">
         <div class="button-row">
-            <button onclick="handleManual()">Search Location</button>
-            <span class="or-label">OR</span>
-            <button onclick="getLocation()">Use Current GPS</button>
+            <button onclick="handleManual()">Search</button>
+            <button onclick="getLocation()">Use GPS</button>
         </div>
     </div>
 </div>
 <script>
-    function getWeatherCondition(code) {
-        const map = { 0: { text: "Clear Sky", icon: "☀️" }, 1: { text: "Mainly Clear", icon: "🌤️" }, 2: { text: "Partly Cloudy", icon: "⛅" }, 3: { text: "Overcast", icon: "☁️" }, 45: { text: "Fog", icon: "🌫️" }, 48: { text: "Depositing Rime Fog", icon: "🌫️" }, 51: { text: "Light Drizzle", icon: "🌧️" }, 53: { text: "Moderate Drizzle", icon: "🌧️" }, 55: { text: "Dense Drizzle", icon: "🌧️" }, 61: { text: "Slight Rain", icon: "🌦️" }, 63: { text: "Moderate Rain", icon: "🌧️" }, 65: { text: "Heavy Rain", icon: "🌧️" }, 71: { text: "Slight Snow", icon: "🌨️" }, 73: { text: "Moderate Snow", icon: "❄️" }, 75: { text: "Heavy Snow", icon: "❄️" }, 95: { text: "Thunderstorm", icon: "⛈️" } };
-        return map[code] || { text: "Unknown", icon: "🌡️" };
-    }
-    function createGauge(val, min, max, color) {
-        let percent = (val - min) / (max - min);
-        if (percent < 0) percent = 0; if (percent > 1) percent = 1;
-        const circumference = Math.PI * 35; const offset = circumference * (1 - percent);
-        return `<div class="gauge-container"><svg class="gauge-svg" viewBox="0 0 100 50"><path class="gauge-bg" d="M 15 45 A 35 35 0 0 1 85 45" /><path class="gauge-fill" d="M 15 45 A 35 35 0 0 1 85 45" stroke="${color}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" /></svg></div>`;
-    }
-    function formatTime(time24) {
-        let [h, m] = time24.split(':'); h = parseInt(h, 10);
-        let ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; 
-        return `${h}:${m} ${ampm}`;
-    }
-    window.toggleForecast = function(type) {
-        const hContainer = document.getElementById('hourlyContainer'), wContainer = document.getElementById('weeklyContainer'), btnRow = document.getElementById('forecast-btn-container');
-        if (type === 'hourly') {
-            hContainer.classList.remove('hidden'); wContainer.classList.add('hidden');
-            btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Hourly Forecast ✖</button>`;
-        } else if (type === 'weekly') {
-            wContainer.classList.remove('hidden'); hContainer.classList.add('hidden');
-            btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Weekly Forecast ✖</button>`;
-        } else {
-            hContainer.classList.add('hidden'); wContainer.classList.add('hidden');
-            btnRow.innerHTML = `<button class="forecast-btn" onclick="toggleForecast('hourly')">Hourly</button><button class="forecast-btn" onclick="toggleForecast('weekly')">7-Day</button>`;
-        }
+    function getCond(c) { const m = {0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",61:"🌧️",95:"⛈️"}; return m[c] || "🌡️"; }
+    function formatTime(t) { return t.split('T')[1].slice(0,5); }
+    window.toggleForecast = function(t) {
+        document.getElementById('hourlyContainer').classList.toggle('hidden', t !== 'hourly');
+        document.getElementById('weeklyContainer').classList.toggle('hidden', t !== 'weekly');
     };
     async function fetchWeather(lat, lon, label) {
-        let displayLabel = label;
-        if (label === "GPS Detected" || label === "IP Detected") {
-            try {
-                const geo = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`)).json();
-                if (geo.address && (geo.address.city || geo.address.town || geo.address.county)) displayLabel = geo.address.city || geo.address.town || geo.address.county;
-            } catch (e) { console.log("Reverse geocode failed."); }
-        }
-        const [weather, aqiData] = await Promise.all([
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`).then(res => res.json()),
-            fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`).then(res => res.json()).catch(() => ({}))
+        const [w, a] = await Promise.all([
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&temperature_unit=fahrenheit&timezone=auto`).then(r => r.json()),
+            fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`).then(r => r.json()).catch(() => ({}))
         ]);
-        const c = weather.current, d = weather.daily, h = weather.hourly, condition = getWeatherCondition(c.weathercode), currentLocalHour = parseInt(c.time.substring(11, 13), 10);
-        let aqiVal = aqiData.current ? aqiData.current.us_aqi : "N/A", aqiColor = "#718096", aqiLabel = "Unknown";
-        if (aqiVal !== "N/A") {
-            if (aqiVal <= 50) { aqiColor = "#38a169"; aqiLabel = "Good"; } else if (aqiVal <= 100) { aqiColor = "#d69e2e"; aqiLabel = "Moderate"; } else if (aqiVal <= 150) { aqiColor = "#dd6b20"; aqiLabel = "Sensitive"; } else if (aqiVal <= 200) { aqiColor = "#e53e3e"; aqiLabel = "Unhealthy"; } else { aqiColor = "#805ad5"; aqiLabel = "Hazardous"; }
-        }
-        document.getElementById('alertBanner').style.display = (c.weathercode >= 95) ? 'block' : 'none';
+        const c = w.current, d = w.daily, h = w.hourly;
+        document.getElementById('alertBanner').style.display = c.weathercode >= 95 ? 'block' : 'none';
         document.getElementById('ui').innerHTML = `
-            <div class="main-weather">
-                <div class="condition-icon">${condition.icon}</div>
-                <div class="temp">${Math.round(c.temperature_2m)}°</div>
-                <div class="condition-text">${condition.text}</div>
-            </div>
+            <div class="main-weather"><div style="font-size: 2rem">${getCond(c.weathercode)}</div><div class="temp">${Math.round(c.temperature_2m)}°</div></div>
             <div class="grid">
-                <div class="box"><div class="box-title">Today's Range</div>${createGauge(c.temperature_2m, d.temperature_2m_min[0], d.temperature_2m_max[0], "#ed8936")}<div class="box-val">${Math.round(d.temperature_2m_min[0])}° - ${Math.round(d.temperature_2m_max[0])}°</div></div>
-                <div class="box"><div class="box-title">Humidity 💧</div>${createGauge(c.relative_humidity_2m, 0, 100, "#4299e1")}<div class="box-val">${c.relative_humidity_2m}%</div></div>
-                <div class="box"><div class="box-title">Wind 💨</div>${createGauge(c.wind_speed_10m, 0, 40, "#9f7aea")}<div class="box-val">${c.wind_speed_10m} mph</div></div>
-                <div class="box sun-box"><div class="box-title">Sun Cycle</div><div class="sun-icon">🌅</div><div class="box-val" style="font-size: 0.85rem;">${formatTime(d.sunrise[0].split('T')[1])} <br> to <br> ${formatTime(d.sunset[0].split('T')[1])}</div></div>
+                <div class="box"><div class="box-title">Range</div><div class="box-val">${Math.round(d.temperature_2m_min[0])}° - ${Math.round(d.temperature_2m_max[0])}°</div></div>
+                <div class="box"><div class="box-title">Sun</div><div class="box-val">${formatTime(d.sunrise[0])} / ${formatTime(d.sunset[0])}</div></div>
             </div>
-            <div class="forecast-section">
-                <div id="forecast-btn-container" class="forecast-btn-row"><button class="forecast-btn" onclick="toggleForecast('hourly')">Hourly</button><button class="forecast-btn" onclick="toggleForecast('weekly')">7-Day</button></div>
-                <div id="hourlyContainer" class="hidden"><div class="scroll-container">${Array.from({length:24}, (_,i)=>`<div class="time-block ${i===currentLocalHour?'current':''}"><div class="block-label">${i===0?12:i>12?i-12:i} ${i<12?'AM':'PM'}</div><div class="block-val">${Math.round(h.temperature_2m[i])}°</div></div>`).join('')}</div></div>
-                <div id="weeklyContainer" class="hidden"><div class="scroll-container">${d.time.map((t,i)=>`<div class="time-block"><div class="block-label">${i===0?'Today':new Date(t+'T12:00:00').toLocaleDateString('en-US',{weekday:'short'})}</div><div class="block-icon">${getWeatherCondition(d.weathercode[i]).icon}</div><div class="block-val" style="font-size: 0.9rem; display: flex; gap: 5px;"><span style="color:#e67a22">${Math.round(d.temperature_2m_max[i])}°</span><span style="color:#718096">${Math.round(d.temperature_2m_min[i])}°</span></div></div>`).join('')}</div></div>
-            </div>
-            <div class="footer-info">
-                <div class="pill-container">
-                    <span class="pill">☔ ${d.precipitation_probability_max[0]}% Rain</span>
-                    <a href="https://www.airnow.gov/?city=${displayLabel.split(',')[0]}" target="_blank" class="pill link-pill">🍃 Air Qual: ${aqiVal} <span style="color: ${aqiColor};">(${aqiLabel})</span></a>
-                </div>
-                <div class="location-line"><span>📍 ${displayLabel}</span> <span style="color: #cbd5e1;">|</span> <span>${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}</span></div>
-            </div>
-        `;
+            <div class="forecast-btn-row"><button class="btn" onclick="toggleForecast('hourly')">Hourly</button><button class="btn" onclick="toggleForecast('weekly')">7-Day</button></div>
+            <div id="hourlyContainer" class="hidden scroll-container">${Array.from({length:12}, (_,i)=>`<div class="time-block"><div style="font-size:0.6rem">${i+1}h</div><div class="box-val">${Math.round(h.temperature_2m[i])}°</div></div>`).join('')}</div>
+            <div id="weeklyContainer" class="hidden scroll-container">${d.time.map((t,i)=>`<div class="time-block"><div style="font-size:0.6rem">${t.slice(5)}</div><div class="box-val">${Math.round(d.temperature_2m_max[i])}°</div></div>`).join('')}</div>
+            <div class="pill-container"><span class="pill">☔ ${d.precipitation_probability_max[0]}%</span><a href="https://www.airnow.gov/" class="pill">🍃 AQI: ${a.current?.us_aqi || 'N/A'}</a></div>
+            <div class="location-line">📍 ${label}</div>`;
     }
     async function handleManual() {
-        const query = document.getElementById('manualLoc').value.trim();
-        if (!query) return;
-        const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
-        if(res.length > 0) fetchWeather(res[0].lat, res[0].lon, query); else alert("Location not found.");
+        const q = document.getElementById('manualLoc').value;
+        const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`)).json();
+        if(res.length) fetchWeather(res[0].lat, res[0].lon, res[0].display_name.split(',')[0]);
     }
     function getLocation() {
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition((p) => fetchWeather(p.coords.latitude, p.coords.longitude, "GPS Detected"), async () => {
-            const ip = await (await fetch("https://ipapi.co/json/")).json();
-            fetchWeather(ip.latitude, ip.longitude, "IP Detected");
+        navigator.geolocation.getCurrentPosition(p => fetchWeather(p.coords.latitude, p.coords.longitude, "GPS"), async () => {
+            const i = await (await fetch("https://ipapi.co/json/")).json();
+            fetchWeather(i.latitude, i.longitude, i.city);
         });
     }
     getLocation();
