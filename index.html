@@ -21,7 +21,7 @@
         
         body.dark-mode { background: linear-gradient(135deg, #1a202c, #2d3748); }
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
-        body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val { color: #f7fafc; }
+        body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val, body.dark-mode .location-text { color: #f7fafc; }
         
         /* Base (Mobile) Styles */
         .card { 
@@ -35,88 +35,20 @@
             transition: all 0.3s ease;
         }
         
-        .header-row { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-bottom: 10px; 
-        }
+        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .page-title { color: #2c3e50; margin: 0; font-size: 1.1rem; font-weight: 700; }
+        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
         
-        .page-title { 
-            color: #2c3e50; 
-            margin: 0; 
-            font-size: 1.1rem; 
-            font-weight: 700; 
-        }
+        #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
         
-        .theme-btn { 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 1.2rem; 
-        }
-        
-        #alertBanner { 
-            background: #e53e3e; 
-            color: white; 
-            padding: 10px; 
-            border-radius: 12px; 
-            margin-bottom: 10px; 
-            font-size: 0.8rem; 
-            text-align: center; 
-            display: none; 
-            font-weight: 700; 
-        }
-        
-        .main-weather {
-            background: rgba(66, 153, 225, 0.1);
-            border-radius: 16px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
+        .main-weather { background: rgba(66, 153, 225, 0.1); border-radius: 16px; padding: 15px; text-align: center; margin-bottom: 10px; }
         .condition-icon { font-size: 2.5rem; margin-bottom: -10px; transition: all 0.3s ease;}
-        
-        .temp { 
-            font-size: 4rem; 
-            font-weight: 700; 
-            color: #2d3748; 
-            line-height: 1; 
-            margin: 10px 0; 
-            letter-spacing: -2px; 
-            transition: all 0.3s ease;
-        }
-        
+        .temp { font-size: 4rem; font-weight: 700; color: #2d3748; line-height: 1; margin: 10px 0; letter-spacing: -2px; }
         .condition-text { font-size: 1rem; color: #4a5568; font-weight: 500; }
 
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 8px; 
-            margin-bottom: 10px; 
-        }
-        
-        .box { 
-            background: #f8fafc; 
-            padding: 10px 8px; 
-            border-radius: 16px; 
-            text-align: center; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .box-title { 
-            font-size: 0.7rem; 
-            color: #718096; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
-            margin-bottom: 5px; 
-        }
-        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .box { background: #f8fafc; padding: 10px 8px; border-radius: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+        .box-title { font-size: 0.7rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
         .box-val { font-size: 1rem; color: #2d3748; font-weight: 700; margin-top: 5px; }
 
         .gauge-container { width: 70px; height: 40px; position: relative; margin-top: 5px; }
@@ -128,98 +60,34 @@
         .sun-icon { font-size: 1.3rem; margin: 5px 0; }
 
         .forecast-section { margin-bottom: 10px; }
-        
         .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 8px; }
-        
-        .forecast-btn { 
-            flex: 1; 
-            padding: 10px; 
-            background: #edf2f7; 
-            color: #4a5568; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-            font-size: 0.8rem; 
-        }
-        
+        .forecast-btn { flex: 1; padding: 10px; background: #edf2f7; color: #4a5568; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-size: 0.8rem; }
         .forecast-btn:hover { background: #e2e8f0; }
         .forecast-btn.active-close { background: #cbd5e1; color: #2d3748; }
 
-        .scroll-container { 
-            display: flex; 
-            overflow-x: auto; 
-            gap: 8px; 
-            padding-bottom: 5px; 
-            scroll-behavior: smooth; 
-        }
-        
+        .scroll-container { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scroll-behavior: smooth; }
         .scroll-container::-webkit-scrollbar { display: none; }
-        
-        .time-block { 
-            min-width: 60px; 
-            text-align: center; 
-            background: #f8fafc; 
-            padding: 10px 5px; 
-            border-radius: 12px; 
-            border: 1px solid #e2e8f0;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center;
-        }
-        
+        .time-block { min-width: 60px; text-align: center; background: #f8fafc; padding: 10px 5px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .time-block.current { background: #3182ce; color: white; border-color: #3182ce; }
-        
         .block-label { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
         .block-val { font-size: 1rem; font-weight: 700; }
         .block-icon { font-size: 1.2rem; margin: 2px 0; }
-        
         .hidden { display: none; }
 
-        .controls { 
-            background: #f1f5f9; 
-            padding: 12px; 
-            border-radius: 16px; 
-            margin-top: 10px; 
-        }
-        
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            box-sizing: border-box; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 8px; 
-            font-family: 'Inter', sans-serif; 
-        }
-        
+        .controls { background: #f1f5f9; padding: 12px; border-radius: 16px; margin-top: 10px; }
+        input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter', sans-serif; }
         input:focus { outline: none; border-color: #3182ce; }
-        
-        .button-row { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-top: 10px; 
-            gap: 8px; 
-        }
-        
-        .button-row button { 
-            flex: 1; 
-            padding: 10px 5px; 
-            border: none; 
-            background: #3182ce; 
-            color: white; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 0.8rem; 
-            transition: background 0.2s; 
-        }
-        
+        .button-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 8px; }
+        .button-row button { flex: 1; padding: 10px 5px; border: none; background: #3182ce; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: background 0.2s; }
         .button-row button:hover { background: #2b6cb0; }
         .or-label { font-size: 0.75rem; color: #a0aec0; font-weight: 700; }
-        .footer-info { margin-top: 15px; text-align: center; font-size: 0.8rem; color: #a0aec0; line-height: 1.5; }
+        
+        /* New Footer Styling */
+        .footer-info { margin-top: 15px; text-align: center; }
+        .pill-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .pill { background: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; color: #4a5568; }
+        .location-text { font-size: 0.9rem; color: #718096; font-weight: 600; }
+        .coords { font-size: 0.7rem; color: #a0aec0; margin-top: 5px; }
 
         /* Tablet Adjustments */
         @media (min-width: 600px) {
@@ -302,10 +170,8 @@
         let percent = (val - min) / (max - min);
         if (percent < 0) percent = 0;
         if (percent > 1) percent = 1;
-        
         const circumference = Math.PI * 35; 
         const offset = circumference * (1 - percent);
-
         return `
             <div class="gauge-container">
                 <svg class="gauge-svg" viewBox="0 0 100 50">
@@ -334,16 +200,13 @@
             hContainer.classList.remove('hidden');
             wContainer.classList.add('hidden');
             btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Hourly Forecast ✖</button>`;
-            
             const targetId = hContainer.getAttribute('data-current-hour-id');
             const currentHourEl = document.getElementById(targetId);
             if (currentHourEl) currentHourEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            
         } else if (type === 'weekly') {
             wContainer.classList.remove('hidden');
             hContainer.classList.add('hidden');
             btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Weekly Forecast ✖</button>`;
-            
         } else {
             hContainer.classList.add('hidden');
             wContainer.classList.add('hidden');
@@ -376,10 +239,7 @@
             ]);
             weather = await weatherRes.json();
             if (aqiRes && aqiRes.ok) aqiData = await aqiRes.json();
-        } catch (error) {
-            console.error("Error fetching data", error);
-            return;
-        }
+        } catch (error) { return; }
 
         const c = weather.current;
         const d = weather.daily;
@@ -387,7 +247,6 @@
         const condition = getWeatherCondition(c.weathercode);
         const currentLocalHour = parseInt(c.time.substring(11, 13), 10);
         
-        // Air Quality Logic
         let aqiVal = aqiData && aqiData.current ? aqiData.current.us_aqi : "N/A";
         let aqiColor = "#718096";
         let aqiLabel = "Unknown";
@@ -408,13 +267,7 @@
             let displayHour = i === 0 ? 12 : (i > 12 ? i - 12 : i);
             let ampm = i < 12 ? 'AM' : 'PM';
             let isCurrent = i === currentLocalHour;
-            
-            hourlyHTML += `
-                <div class="time-block ${isCurrent ? 'current' : ''}" id="hour-block-${i}">
-                    <div class="block-label">${displayHour} ${ampm}</div>
-                    <div class="block-val">${Math.round(h.temperature_2m[i])}°</div>
-                </div>
-            `;
+            hourlyHTML += `<div class="time-block ${isCurrent ? 'current' : ''}" id="hour-block-${i}"><div class="block-label">${displayHour} ${ampm}</div><div class="block-val">${Math.round(h.temperature_2m[i])}°</div></div>`;
         }
 
         let weeklyHTML = '';
@@ -423,9 +276,7 @@
             let dateObj = new Date(dateStr);
             let dayName = dateObj.toLocaleDateString('en-US', {weekday: 'short'});
             if (i === 0) dayName = "Today";
-
             let dayCond = getWeatherCondition(d.weathercode[i]);
-            
             weeklyHTML += `
                 <div class="time-block">
                     <div class="block-label">${dayName}</div>
@@ -434,8 +285,7 @@
                         <span style="color:#e67a22">${Math.round(d.temperature_2m_max[i])}°</span>
                         <span style="color:#718096">${Math.round(d.temperature_2m_min[i])}°</span>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         document.getElementById('ui').innerHTML = `
@@ -477,31 +327,19 @@
                     <button class="forecast-btn" onclick="toggleForecast('hourly')">Hourly</button>
                     <button class="forecast-btn" onclick="toggleForecast('weekly')">7-Day</button>
                 </div>
-                
-                <div id="hourlyContainer" class="hidden" data-current-hour-id="hour-block-${currentLocalHour}">
-                    <div class="scroll-container">${hourlyHTML}</div>
-                </div>
-                
-                <div id="weeklyContainer" class="hidden">
-                    <div class="scroll-container">${weeklyHTML}</div>
-                </div>
+                <div id="hourlyContainer" class="hidden" data-current-hour-id="hour-block-${currentLocalHour}"><div class="scroll-container">${hourlyHTML}</div></div>
+                <div id="weeklyContainer" class="hidden"><div class="scroll-container">${weeklyHTML}</div></div>
             </div>
 
             <div class="footer-info">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; color: #2d3748; flex-wrap: wrap;">
-                    <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-weight: 600;">☔ Rain: ${d.precipitation_probability_max[0]}%</span>
-                    
-                    <a href="${aqLink}" target="_blank" style="text-decoration: none; color: inherit;">
-                        <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-weight: 600; cursor: pointer; display: inline-block;">
-                            🍃 AQI: ${aqiVal} <span style="color: ${aqiColor};">(${aqiLabel})</span>
-                        </span>
+                <div class="pill-container">
+                    <span class="pill">☔ Rain: ${d.precipitation_probability_max[0]}%</span>
+                    <a href="${aqLink}" target="_blank" style="text-decoration: none;">
+                        <span class="pill" style="cursor: pointer;">🍃 AQI: ${aqiVal} <span style="color: ${aqiColor};">(${aqiLabel})</span></span>
                     </a>
-                    
-                    <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-weight: 600;">📍 ${displayLabel}</span>
                 </div>
-                <div style="margin-top: 10px;">
-                    <span style="font-size: 0.7rem;">Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}</span>
-                </div>
+                <div class="location-text">📍 ${displayLabel}</div>
+                <div class="coords">Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}</div>
             </div>
         `;
     }
@@ -509,10 +347,8 @@
     async function handleManual() {
         const query = document.getElementById('manualLoc').value.trim();
         if (!query) return;
-
         const ddmRegex = /([NS])\s*(\d+)°?\s*([\d.]+)\s*([EW])\s*(\d+)°?\s*([\d.]+)/i;
         const match = query.match(ddmRegex);
-        
         if (match) {
             let lat = Number(match[2]) + (Number(match[3]) / 60);
             if (match[1].toUpperCase() === 'S') lat = -lat;
@@ -521,13 +357,9 @@
             fetchWeather(lat, lon, query);
             return;
         }
-
         const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
-        if(res.length > 0) {
-            fetchWeather(res[0].lat, res[0].lon, query);
-        } else {
-            alert("Location not found. Please try a valid city, zip code, or GPS coordinate.");
-        }
+        if(res.length > 0) { fetchWeather(res[0].lat, res[0].lon, query); }
+        else { alert("Location not found."); }
     }
 
     function getLocation() {
