@@ -23,16 +23,13 @@
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
         body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val { color: #f7fafc; }
         
-        /* Updated: Responsive Card Width */
         .card { 
             background: white; 
             padding: 20px; 
-            width: 100%; 
-            max-width: 400px; /* Limits width on mobile */
+            width: 340px; 
             border-radius: 24px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             box-sizing: border-box;
-            transition: max-width 0.3s ease;
         }
         
         .header-row { 
@@ -152,25 +149,11 @@
             display: flex; 
             overflow-x: auto; 
             gap: 8px; 
-            padding-bottom: 10px; /* Added extra padding to make room for scrollbar */
+            padding-bottom: 5px; 
             scroll-behavior: smooth; 
         }
         
-        /* Updated: Sleek scrollbar for desktop users so they can scroll right */
-        .scroll-container::-webkit-scrollbar { 
-            height: 6px; 
-            display: block; 
-        }
-        .scroll-container::-webkit-scrollbar-track { 
-            background: transparent; 
-        }
-        .scroll-container::-webkit-scrollbar-thumb { 
-            background: #cbd5e1; 
-            border-radius: 10px; 
-        }
-        body.dark-mode .scroll-container::-webkit-scrollbar-thumb { 
-            background: #4a5568; 
-        }
+        .scroll-container::-webkit-scrollbar { display: none; }
         
         .time-block { 
             min-width: 60px; 
@@ -240,52 +223,13 @@
         
         .footer-info { margin-top: 15px; text-align: center; font-size: 0.7rem; color: #a0aec0; }
 
-        /* Mobile specific layout tightening */
-        @media (max-width: 767px) {
-            .card { padding: 5px !important; }
-            .main-weather { margin-bottom: 5px !important; padding: 5px !important; }
-            .grid { margin-bottom: 5px !important; gap: 4px !important; }
-            .box { padding: 4px !important; }
-            .forecast-section { margin-bottom: 5px !important; }
-            .controls { padding: 5px !important; margin-top: 5px !important; }
-        }
-
-        /* Desktop specific layout expansion */
-        @media (min-width: 768px) {
-            body { padding: 40px 20px; }
-            
-            .card { max-width: 850px; padding: 30px; }
-            
-            #ui { 
-                display: grid; 
-                grid-template-columns: 1fr 1.5fr; 
-                gap: 20px; 
-                align-items: stretch;
-            }
-            
-            .main-weather { 
-                margin-bottom: 0; 
-                display: flex; 
-                flex-direction: column; 
-                justify-content: center; 
-            }
-            
-            .grid { margin-bottom: 0; gap: 15px; }
-            .box { padding: 15px; }
-            
-            .forecast-section { grid-column: span 2; margin-top: 10px; }
-            .footer-info { grid-column: span 2; }
-            
-            .controls { 
-                display: flex; 
-                gap: 15px; 
-                align-items: center; 
-                padding: 20px;
-            }
-            
-            .controls input { flex: 2; margin-bottom: 0; }
-            .button-row { flex: 3; margin-top: 0; }
-        }
+        /* Tighten layout */
+        .card { padding: 5px !important; }
+        .main-weather { margin-bottom: 5px !important; padding: 5px !important; }
+        .grid { margin-bottom: 5px !important; gap: 4px !important; }
+        .box { padding: 4px !important; }
+        .forecast-section { margin-bottom: 5px !important; }
+        .controls { padding: 5px !important; margin-top: 5px !important; }
         
     </style>
 </head>
@@ -300,7 +244,7 @@
     <div id="alertBanner">⚠️ Alert: Severe Weather</div>
 
     <div id="ui">
-        <div style="text-align:center; padding: 20px; color: #718096; grid-column: span 2;">Fetching localized data...</div>
+        <div style="text-align:center; padding: 20px; color: #718096;">Fetching localized data...</div>
     </div>
     
     <div class="controls">
@@ -355,6 +299,15 @@
         `;
     }
 
+    // Helper to format 24h to 12h time
+    function formatTime(time24) {
+        let [h, m] = time24.split(':');
+        h = parseInt(h, 10);
+        let ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12; // Converts '0' to '12' for midnight/noon edges
+        return `${h}:${m} ${ampm}`;
+    }
+
     window.toggleForecast = function(type) {
         const hContainer = document.getElementById('hourlyContainer');
         const wContainer = document.getElementById('weeklyContainer');
@@ -395,7 +348,8 @@
             } catch (e) { console.log("Reverse geocode failed."); }
         }
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
+        // Added precipitation_probability_max to the daily API request
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
         const weather = await (await fetch(url)).json();
         
         const c = weather.current;
@@ -469,9 +423,9 @@
                     <div class="box-title">Sun Cycle</div>
                     <div class="sun-icon">🌅</div>
                     <div class="box-val" style="font-size: 0.85rem;">
-                        ${d.sunrise[0].split('T')[1]} <br> 
+                        ${formatTime(d.sunrise[0].split('T')[1])} <br> 
                         <span style="color: #718096; font-size: 0.7rem;">to</span> <br> 
-                        ${d.sunset[0].split('T')[1]}
+                        ${formatTime(d.sunset[0].split('T')[1])}
                     </div>
                 </div>
             </div>
@@ -492,7 +446,10 @@
             </div>
 
             <div class="footer-info">
-                📍 <b>${displayLabel}</b> <br>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; color: #2d3748;">
+                    <span>☔ Rain: <b>${d.precipitation_probability_max[0]}%</b></span>
+                    <span>📍 <b>${displayLabel}</b></span>
+                </div>
                 <a href="${aqLink}" target="_blank" style="color:#3182ce; font-weight:700; text-decoration:none;">See Air Quality</a><br>
                 Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}
             </div>
