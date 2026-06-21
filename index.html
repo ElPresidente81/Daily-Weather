@@ -12,7 +12,7 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 15px 10px 40px; 
+            padding: 20px 10px 40px; 
             margin: 0;
             min-height: 100vh;
             box-sizing: border-box; 
@@ -23,20 +23,23 @@
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
         body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val { color: #f7fafc; }
         
+        /* Base (Mobile) Styles */
         .card { 
             background: white; 
-            padding: 20px; 
-            width: 340px; 
+            padding: 15px; 
+            width: 100%; 
+            max-width: 360px; 
             border-radius: 24px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
         
         .header-row { 
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
         }
         
         .page-title { 
@@ -58,7 +61,7 @@
             color: white; 
             padding: 10px; 
             border-radius: 12px; 
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
             font-size: 0.8rem; 
             text-align: center; 
             display: none; 
@@ -70,10 +73,10 @@
             border-radius: 16px;
             padding: 15px;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
-        .condition-icon { font-size: 2.5rem; margin-bottom: -10px; }
+        .condition-icon { font-size: 2.5rem; margin-bottom: -10px; transition: all 0.3s ease;}
         
         .temp { 
             font-size: 4rem; 
@@ -82,6 +85,7 @@
             line-height: 1; 
             margin: 10px 0; 
             letter-spacing: -2px; 
+            transition: all 0.3s ease;
         }
         
         .condition-text { font-size: 1rem; color: #4a5568; font-weight: 500; }
@@ -89,13 +93,13 @@
         .grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            margin-bottom: 15px; 
+            gap: 8px; 
+            margin-bottom: 10px; 
         }
         
         .box { 
             background: #f8fafc; 
-            padding: 12px 8px; 
+            padding: 10px 8px; 
             border-radius: 16px; 
             text-align: center; 
             display: flex;
@@ -121,12 +125,11 @@
         .gauge-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease-out; }
 
         .sun-box { background: rgba(237, 137, 54, 0.1); }
-        
         .sun-icon { font-size: 1.3rem; margin: 5px 0; }
 
-        .forecast-section { margin-bottom: 15px; }
+        .forecast-section { margin-bottom: 10px; }
         
-        .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .forecast-btn-row { display: flex; gap: 8px; margin-bottom: 8px; }
         
         .forecast-btn { 
             flex: 1; 
@@ -142,7 +145,6 @@
         }
         
         .forecast-btn:hover { background: #e2e8f0; }
-        
         .forecast-btn.active-close { background: #cbd5e1; color: #2d3748; }
 
         .scroll-container { 
@@ -171,18 +173,16 @@
         .time-block.current { background: #3182ce; color: white; border-color: #3182ce; }
         
         .block-label { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
-        
         .block-val { font-size: 1rem; font-weight: 700; }
-        
         .block-icon { font-size: 1.2rem; margin: 2px 0; }
         
         .hidden { display: none; }
 
         .controls { 
             background: #f1f5f9; 
-            padding: 15px; 
+            padding: 12px; 
             border-radius: 16px; 
-            margin-top: 5px; 
+            margin-top: 10px; 
         }
         
         input { 
@@ -200,7 +200,7 @@
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
-            margin-top: 12px; 
+            margin-top: 10px; 
             gap: 8px; 
         }
         
@@ -218,19 +218,37 @@
         }
         
         .button-row button:hover { background: #2b6cb0; }
-        
         .or-label { font-size: 0.75rem; color: #a0aec0; font-weight: 700; }
-        
-        .footer-info { margin-top: 15px; text-align: center; font-size: 0.7rem; color: #a0aec0; }
+        .footer-info { margin-top: 15px; text-align: center; font-size: 0.8rem; color: #a0aec0; line-height: 1.5; }
 
-        /* Tighten layout */
-        .card { padding: 5px !important; }
-        .main-weather { margin-bottom: 5px !important; padding: 5px !important; }
-        .grid { margin-bottom: 5px !important; gap: 4px !important; }
-        .box { padding: 4px !important; }
-        .forecast-section { margin-bottom: 5px !important; }
-        .controls { padding: 5px !important; margin-top: 5px !important; }
-        
+        /* Tablet Adjustments */
+        @media (min-width: 600px) {
+            .card { max-width: 600px; padding: 25px; }
+            .grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+            .temp { font-size: 5rem; }
+            .main-weather { padding: 20px; margin-bottom: 15px; }
+            .box { padding: 15px 10px; }
+            .controls { padding: 20px; margin-top: 15px; }
+            .forecast-btn { font-size: 0.9rem; padding: 12px; }
+            .time-block { min-width: 75px; padding: 15px 8px; }
+            .button-row button { padding: 12px 10px; font-size: 0.9rem; }
+            .page-title { font-size: 1.3rem; }
+        }
+
+        /* Desktop PC Adjustments */
+        @media (min-width: 900px) {
+            .card { max-width: 800px; padding: 35px; }
+            .temp { font-size: 6.5rem; margin: 15px 0; }
+            .condition-icon { font-size: 3.5rem; }
+            .condition-text { font-size: 1.2rem; }
+            .box-val { font-size: 1.2rem; }
+            .box-title { font-size: 0.8rem; }
+            .button-row { gap: 15px; }
+            .forecast-btn { font-size: 1rem; padding: 15px; }
+            .time-block { min-width: 90px; }
+            .block-val { font-size: 1.2rem; }
+            .block-label { font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -299,12 +317,11 @@
         `;
     }
 
-    // Helper to format 24h to 12h time
     function formatTime(time24) {
         let [h, m] = time24.split(':');
         h = parseInt(h, 10);
         let ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12; // Converts '0' to '12' for midnight/noon edges
+        h = h % 12 || 12; 
         return `${h}:${m} ${ampm}`;
     }
 
@@ -348,7 +365,6 @@
             } catch (e) { console.log("Reverse geocode failed."); }
         }
 
-        // Added precipitation_probability_max to the daily API request
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&hourly=temperature_2m&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`;
         const weather = await (await fetch(url)).json();
         
@@ -388,7 +404,7 @@
                 <div class="time-block">
                     <div class="block-label">${dayName}</div>
                     <div class="block-icon">${dayCond.icon}</div>
-                    <div class="block-val" style="font-size: 0.8rem; display: flex; gap: 5px;">
+                    <div class="block-val" style="font-size: 0.9rem; display: flex; gap: 5px; justify-content: center;">
                         <span style="color:#e67a22">${Math.round(d.temperature_2m_max[i])}°</span>
                         <span style="color:#718096">${Math.round(d.temperature_2m_min[i])}°</span>
                     </div>
@@ -447,11 +463,13 @@
 
             <div class="footer-info">
                 <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; color: #2d3748;">
-                    <span>☔ Rain: <b>${d.precipitation_probability_max[0]}%</b></span>
-                    <span>📍 <b>${displayLabel}</b></span>
+                    <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-weight: 600;">☔ Rain: ${d.precipitation_probability_max[0]}%</span>
+                    <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-weight: 600;">📍 ${displayLabel}</span>
                 </div>
-                <a href="${aqLink}" target="_blank" style="color:#3182ce; font-weight:700; text-decoration:none;">See Air Quality</a><br>
-                Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}
+                <div style="margin-top: 10px;">
+                    <a href="${aqLink}" target="_blank" style="color:#3182ce; font-weight:700; text-decoration:none;">See Air Quality Index</a><br>
+                    <span style="font-size: 0.7rem;">Coords: ${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}</span>
+                </div>
             </div>
         `;
     }
