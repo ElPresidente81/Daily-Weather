@@ -23,7 +23,6 @@
         body.dark-mode .card, body.dark-mode .box, body.dark-mode .time-block, body.dark-mode .controls { background: #2d3748; color: #f7fafc; border-color: #4a5568; }
         body.dark-mode .page-title, body.dark-mode .temp, body.dark-mode .box-val, body.dark-mode .location-text { color: #f7fafc; }
         
-        /* Base (Mobile) Styles */
         .card { 
             background: white; 
             padding: 15px; 
@@ -42,7 +41,7 @@
         #alertBanner { background: #e53e3e; color: white; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 0.8rem; text-align: center; display: none; font-weight: 700; }
         
         .main-weather { background: rgba(66, 153, 225, 0.1); border-radius: 16px; padding: 15px; text-align: center; margin-bottom: 10px; }
-        .condition-icon { font-size: 2.5rem; margin-bottom: -10px; transition: all 0.3s ease;}
+        .condition-icon { font-size: 2.5rem; margin-bottom: -10px; }
         .temp { font-size: 4rem; font-weight: 700; color: #2d3748; line-height: 1; margin: 10px 0; letter-spacing: -2px; }
         .condition-text { font-size: 1rem; color: #4a5568; font-weight: 500; }
 
@@ -65,8 +64,9 @@
         .forecast-btn:hover { background: #e2e8f0; }
         .forecast-btn.active-close { background: #cbd5e1; color: #2d3748; }
 
-        .scroll-container { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scroll-behavior: smooth; }
-        .scroll-container::-webkit-scrollbar { display: none; }
+        /* Restored scrolling visibility for desktop */
+        .scroll-container { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; scroll-behavior: smooth; cursor: grab; }
+        .scroll-container:active { cursor: grabbing; }
         .time-block { min-width: 60px; text-align: center; background: #f8fafc; padding: 10px 5px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .time-block.current { background: #3182ce; color: white; border-color: #3182ce; }
         .block-label { font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
@@ -86,33 +86,10 @@
         .pill-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
         .location-line { font-size: 0.85rem; color: #718096; font-weight: 600; text-align: center; display: flex; justify-content: center; gap: 10px; }
 
-        /* Tablet Adjustments */
         @media (min-width: 600px) {
             .card { max-width: 600px; padding: 25px; }
-            .grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+            .grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
             .temp { font-size: 5rem; }
-            .main-weather { padding: 20px; margin-bottom: 15px; }
-            .box { padding: 15px 10px; }
-            .controls { padding: 20px; margin-top: 15px; }
-            .forecast-btn, .pill { font-size: 0.9rem; padding: 12px; }
-            .time-block { min-width: 75px; padding: 15px 8px; }
-            .button-row button { padding: 12px 10px; font-size: 0.9rem; }
-            .page-title { font-size: 1.3rem; }
-        }
-
-        /* Desktop PC Adjustments */
-        @media (min-width: 900px) {
-            .card { max-width: 800px; padding: 35px; }
-            .temp { font-size: 6.5rem; margin: 15px 0; }
-            .condition-icon { font-size: 3.5rem; }
-            .condition-text { font-size: 1.2rem; }
-            .box-val { font-size: 1.2rem; }
-            .box-title { font-size: 0.8rem; }
-            .button-row { gap: 15px; }
-            .forecast-btn, .pill { font-size: 1rem; padding: 15px; }
-            .time-block { min-width: 90px; }
-            .block-val { font-size: 1.2rem; }
-            .block-label { font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -164,8 +141,6 @@
         if (type === 'hourly') {
             hContainer.classList.remove('hidden'); wContainer.classList.add('hidden');
             btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Hourly Forecast ✖</button>`;
-            const currentHourEl = document.getElementById(hContainer.getAttribute('data-current-hour-id'));
-            if (currentHourEl) currentHourEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         } else if (type === 'weekly') {
             wContainer.classList.remove('hidden'); hContainer.classList.add('hidden');
             btnRow.innerHTML = `<button class="forecast-btn active-close" onclick="toggleForecast('none')">Close Weekly Forecast ✖</button>`;
@@ -211,7 +186,7 @@
             </div>
             <div class="forecast-section">
                 <div id="forecast-btn-container" class="forecast-btn-row"><button class="forecast-btn" onclick="toggleForecast('hourly')">Hourly</button><button class="forecast-btn" onclick="toggleForecast('weekly')">7-Day</button></div>
-                <div id="hourlyContainer" class="hidden" data-current-hour-id="hour-block-${currentLocalHour}"><div class="scroll-container">${Array.from({length:24}, (_,i)=>`<div class="time-block ${i===currentLocalHour?'current':''}" id="hour-block-${i}"><div class="block-label">${i===0?12:i>12?i-12:i} ${i<12?'AM':'PM'}</div><div class="block-val">${Math.round(h.temperature_2m[i])}°</div></div>`).join('')}</div></div>
+                <div id="hourlyContainer" class="hidden"><div class="scroll-container">${Array.from({length:24}, (_,i)=>`<div class="time-block ${i===currentLocalHour?'current':''}"><div class="block-label">${i===0?12:i>12?i-12:i} ${i<12?'AM':'PM'}</div><div class="block-val">${Math.round(h.temperature_2m[i])}°</div></div>`).join('')}</div></div>
                 <div id="weeklyContainer" class="hidden"><div class="scroll-container">${d.time.map((t,i)=>`<div class="time-block"><div class="block-label">${i===0?'Today':new Date(t+'T12:00:00').toLocaleDateString('en-US',{weekday:'short'})}</div><div class="block-icon">${getWeatherCondition(d.weathercode[i]).icon}</div><div class="block-val" style="font-size: 0.9rem; display: flex; gap: 5px;"><span style="color:#e67a22">${Math.round(d.temperature_2m_max[i])}°</span><span style="color:#718096">${Math.round(d.temperature_2m_min[i])}°</span></div></div>`).join('')}</div></div>
             </div>
             <div class="footer-info">
@@ -227,16 +202,8 @@
     async function handleManual() {
         const query = document.getElementById('manualLoc').value.trim();
         if (!query) return;
-        const ddmRegex = /([NS])\s*(\d+)°?\s*([\d.]+)\s*([EW])\s*(\d+)°?\s*([\d.]+)/i;
-        const match = query.match(ddmRegex);
-        if (match) {
-            let lat = Number(match[2]) + (Number(match[3]) / 60); if (match[1].toUpperCase() === 'S') lat = -lat;
-            let lon = Number(match[5]) + (Number(match[6]) / 60); if (match[4].toUpperCase() === 'W') lon = -lon;
-            fetchWeather(lat, lon, query);
-        } else {
-            const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
-            if(res.length > 0) fetchWeather(res[0].lat, res[0].lon, query); else alert("Location not found.");
-        }
+        const res = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)).json();
+        if(res.length > 0) fetchWeather(res[0].lat, res[0].lon, query); else alert("Location not found.");
     }
 
     function getLocation() {
